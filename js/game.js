@@ -1,0 +1,1966 @@
+/**
+ * CSS Learning Game - Main Game Object
+ * A web-based game for learning CSS with timer functionality
+ */
+
+// SweetAlert2 compatibility check and fallback
+var AlertHelper = {
+  hasSweetAlert: false,
+  init: function () {
+    this.hasSweetAlert = typeof Swal !== "undefined";
+  },
+  fire: function (options) {
+    if (this.hasSweetAlert) {
+      return Swal.fire(options);
+    } else {
+      this.fallbackAlert(options);
+      return Promise.resolve();
+    }
+  },
+  fallbackAlert: function (options) {
+    // Simple fallback for when SweetAlert2 is not available
+    const title = options.title || "";
+    const message = options.html || options.text || "";
+    alert(title + "\n\n" + message.replace(/<[^>]*>/g, ""));
+  },
+};
+
+var game = {
+  // ===========================================
+  // PROPERTIES
+  // ===========================================
+
+  // Game state
+  language: window.location.hash.substring(1) || "id",
+  level: parseInt(localStorage.level, 10) || 0,
+  answers: (localStorage.answers && JSON.parse(localStorage.answers)) || {},
+  solved: (localStorage.solved && JSON.parse(localStorage.solved)) || [],
+  changed: false,
+  clickedCode: null,
+  levelRunCounts: (localStorage.levelRunCounts && JSON.parse(localStorage.levelRunCounts)) || {},
+
+  // Timer properties
+  timer: null,
+  timerStarted: false,
+  timeLeft: localStorage.getItem("timeLeft")
+    ? parseInt(localStorage.getItem("timeLeft"), 10)
+    : 1800, // 30 minutes
+
+  // ===========================================
+  // TIMER METHODS
+  // ===========================================
+
+  /**
+   * Start the game timer
+   */
+  startTimer: function () {
+    if (this.timerStarted) return;
+
+    this.timerStarted = true;
+    var timerDisplay = document.getElementById("timer");
+
+    this.timer = setInterval(function () {
+      if (game.timeLeft > 0) {
+        game.timeLeft--;
+        localStorage.setItem("timeLeft", game.timeLeft);
+
+        var minutes = Math.floor(game.timeLeft / 60);
+        var seconds = game.timeLeft % 60;
+        var display = ` ${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+        timerDisplay.textContent = display;
+        // Sync mobile timer
+        var mobileTimer = document.getElementById("timer-mobile");
+        if (mobileTimer) mobileTimer.textContent = display;
+      } else {
+        game.endGame();
+      }
+    }, 1000);
+  },
+
+  /**
+   * Stop the timer
+   */
+  stopTimer: function () {
+    clearInterval(this.timer);
+    localStorage.setItem("timeLeft", this.timeLeft);
+  },
+
+  /**
+   * Reset timer to initial state
+   */
+  resetTimer: function () {
+    this.timerStarted = false;
+    clearInterval(this.timer);
+    this.timeLeft = 1800; // 30 minutes
+    localStorage.removeItem("timeLeft");
+  },
+
+  // ===========================================
+  // GAME FLOW METHODS
+  // ===========================================
+
+  /**
+   * Initialize and start the game
+   */
+  start: function () {
+    const savedName = localStorage.getItem("playerName");
+    const savedAbsence = localStorage.getItem("playerAbsence");
+
+    if (!savedName || !savedAbsence) {
+      this.showInputPopup();
+      return;
+    }
+
+    this.startTimer();
+    this.initializeGame();
+    this.generateProgressDots();
+  },
+
+  /**
+   * Initialize game components
+   */
+  initializeGame: function () {
+    // Language detection
+    var requestLang = window.navigator.language.split("-")[0];
+    if (
+      window.location.hash === "" &&
+      requestLang !== "en" &&
+      messages.languageActive.hasOwnProperty(requestLang)
+    ) {
+      this.language = requestLang;
+      window.location.hash = requestLang;
+    }
+
+    // Setup UI
+    this.translate();
+    $("#level-counter .total").text(levels.length);
+    $("#editor").show();
+    $("#share").hide();
+    $("#language").val(this.language);
+
+    this.setHandlers();
+    this.loadMenu();
+    this.loadLevel(levels[this.level]);
+  },
+
+  /**
+   * Move to next level
+   */
+  next: function () {
+    this.level++;
+    this.loadLevel(levels[this.level]);
+    this.generateProgressDots();
+    this.updateNextLevelBtn();
+  },
+
+  /**
+   * Move to previous level
+   */
+  prev: function () {
+    this.level--;
+    this.loadLevel(levels[this.level]);
+    this.generateProgressDots();
+    this.updateNextLevelBtn();
+  },
+
+  /**
+   * End the game and show results
+   */
+  endGame: function () {
+    clearInterval(this.timer);
+    this.showResults();
+  },
+
+  /**
+   * Reset game to initial state
+   */
+  resetGame: function () {
+    this.resetTimer();
+    this.level = 0;
+    this.answers = {};
+    this.solved = [];
+    this.loadLevel(levels[0]);
+
+    // Clear player data
+    localStorage.removeItem("playerName");
+    localStorage.removeItem("playerAbsence");
+
+    this.showInputPopup();
+  },
+
+  // ===========================================
+  // USER INTERFACE METHODS
+  // ===========================================
+
+  /**
+   * Show player input popup
+   */
+  // showInputPopup: function () {
+  //   const savedName = localStorage.getItem("playerName");
+  //   const savedAbsence = localStorage.getItem("playerAbsence");
+
+  //   if (!savedName || !savedAbsence) {
+  //     // Check if Swal is available
+  //     if (typeof Swal === "undefined") {
+  //       console.warn("SweetAlert2 is not loaded, using fallback");
+  //       const name = prompt("Enter your name:");
+  //       const absence = prompt("Enter your absence number:");
+  //       if (name && absence) {
+  //         localStorage.setItem("playerName", name);
+  //         localStorage.setItem("playerAbsence", absence);
+  //         location.reload();
+  //       }
+  //       return;
+  //     }
+
+  //     try {
+  //       Swal.fire({
+  //         title: "Welcome!",
+  //         html: `
+  //           <input id="nameInput" class="swal2-input" placeholder="Enter your name" value="${savedName || ""}">
+  //           <input id="absenceInput" class="swal2-input" placeholder="Enter your absence number" value="${savedAbsence || ""}">
+  //         `,
+  //         confirmButtonText: "Start Game",
+  //         focusConfirm: false,
+  //         allowOutsideClick: false,
+  //         customClass: {
+  //           confirmButton: "swal2-biru-btn",
+  //         },
+  //         preConfirm: () => {
+  //           const playerName = document.getElementById("nameInput").value;
+  //           const playerAbsence = document.getElementById("absenceInput").value;
+
+  //           if (!playerName || !playerAbsence) {
+  //             Swal.showValidationMessage(
+  //               "Name and absence number are required!",
+  //             );
+  //             return false;
+  //           }
+
+  //           localStorage.setItem("playerName", playerName);
+  //           localStorage.setItem("playerAbsence", playerAbsence);
+  //           location.reload();
+  //           return true;
+  //         },
+  //       }).then((result) => {
+  //         if (result.isConfirmed) {
+  //           this.initializeGame();
+  //         }
+  //       });
+  //     } catch (e) {
+  //       console.error("Error with SweetAlert2:", e);
+  //       const name = prompt("Enter your name:");
+  //       const absence = prompt("Enter your absence number:");
+  //       if (name && absence) {
+  //         localStorage.setItem("playerName", name);
+  //         localStorage.setItem("playerAbsence", absence);
+  //         location.reload();
+  //       }
+  //     }
+  //   } else {
+  //     this.initializeGame();
+  //   }
+  // },
+
+  showInputPopup: function () {
+    const savedName = localStorage.getItem("playerName");
+    const savedAbsence = localStorage.getItem("playerAbsence");
+
+    if (!savedName || !savedAbsence) {
+      if (typeof Swal === "undefined") {
+        const name = prompt("Enter your name:");
+        const absence = prompt("Enter your absence number:");
+        if (name && absence) {
+          localStorage.setItem("playerName", name);
+          localStorage.setItem("playerAbsence", absence);
+          game.liveSyncData(); // <-- Sinkronisasi saat input prompt
+          setTimeout(() => location.reload(), 500);
+        }
+        return;
+      }
+
+      try {
+        Swal.fire({
+          title: "Welcome!",
+          html: `
+            <input id="nameInput" class="swal2-input" placeholder="Enter your name" value="${savedName || ""}">
+            <input id="absenceInput" class="swal2-input" placeholder="Enter your absence number" value="${savedAbsence || ""}">
+          `,
+          confirmButtonText: "Start Game",
+          focusConfirm: false,
+          allowOutsideClick: false,
+          customClass: {
+            confirmButton: "swal2-biru-btn",
+          },
+          preConfirm: () => {
+            const playerName = document.getElementById("nameInput").value;
+            const playerAbsence = document.getElementById("absenceInput").value;
+
+            if (!playerName || !playerAbsence) {
+              Swal.showValidationMessage(
+                "Name and absence number are required!",
+              );
+              return false;
+            }
+
+            localStorage.setItem("playerName", playerName);
+            localStorage.setItem("playerAbsence", playerAbsence);
+            game.liveSyncData(); // <-- Sinkronisasi saat input Swal
+
+            // Beri jeda 500ms agar pengiriman data berhasil sebelum reload
+            return new Promise(resolve => {
+              setTimeout(() => {
+                location.reload();
+                resolve(true);
+              }, 500);
+            });
+          },
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.initializeGame();
+          }
+        });
+      } catch (e) {
+        const name = prompt("Enter your name:");
+        const absence = prompt("Enter your absence number:");
+        if (name && absence) {
+          localStorage.setItem("playerName", name);
+          localStorage.setItem("playerAbsence", absence);
+          game.liveSyncData(); // <-- Sinkronisasi saat error fallback
+          setTimeout(() => location.reload(), 500);
+        }
+      }
+    } else {
+      this.initializeGame();
+    }
+  },
+
+  /**
+   * Show game results with SweetAlert2
+   */
+  // showResults: function () {
+  //   const playerName = localStorage.getItem("playerName") || "Unknown";
+  //   const playerAbsence = localStorage.getItem("playerAbsence") || "-";
+  //   const totalQuestions = levels.length;
+  //   const correctAnswers = this.solved.length;
+  //   const wrongAnswers = totalQuestions - correctAnswers;
+  //   const score = Math.round((correctAnswers / totalQuestions) * 100);
+
+  //   // Determine performance level and styling
+  //   let performanceLevel = "";
+  //   let performanceColor = "";
+  //   let performanceIcon = "";
+
+  //   if (score >= 90) {
+  //     performanceLevel = "Excellent!";
+  //     performanceColor = "#10b981";
+  //     performanceIcon = "🌟";
+  //   } else if (score >= 80) {
+  //     performanceLevel = "Very Good!";
+  //     performanceColor = "#3b82f6";
+  //     performanceIcon = "🎯";
+  //   } else if (score >= 70) {
+  //     performanceLevel = "Good!";
+  //     performanceColor = "#8b5cf6";
+  //     performanceIcon = "👍";
+  //   } else if (score >= 60) {
+  //     performanceLevel = "Fair";
+  //     performanceColor = "#f59e0b";
+  //     performanceIcon = "📈";
+  //   } else {
+  //     performanceLevel = "Keep Trying!";
+  //     performanceColor = "#ef4444";
+  //     performanceIcon = "💪";
+  //   }
+
+  //   // Check if Swal is available
+  //   if (typeof Swal === "undefined") {
+  //     console.warn("SweetAlert2 is not loaded for results, using fallback");
+  //     const resultText = `QUIZ RESULTS\n\nPlayer: ${playerName}\nAbsence: ${playerAbsence}\nScore: ${score}%\nCorrect: ${correctAnswers}/${totalQuestions}`;
+  //     alert(resultText);
+  //     this.saveResults(score);
+  //     return;
+  //   }
+  //   try {
+  //     const correctDetails =
+  //       this.solved.length > 0
+  //         ? `<div class="question-list correct-list">${this.solved
+  //             .map(
+  //               (q) =>
+  //                 `<div class="question-item correct-item">
+  //                 <span class="question-icon">✅</span>
+  //                 <span class="question-text">${q}</span>
+  //             </div>`,
+  //             )
+  //             .join("")}</div>`
+  //         : '<div class="empty-state">No correct answers</div>';
+
+  //     const wrongDetails =
+  //       totalQuestions > 0
+  //         ? `<div class="question-list wrong-list">${levels
+  //             .map((level) => level.name)
+  //             .filter((name) => !this.solved.includes(name))
+  //             .map(
+  //               (q) =>
+  //                 `<div class="question-item wrong-item">
+  //                     <span class="question-icon">❌</span>
+  //                     <span class="question-text">${q}</span>
+  //                 </div>`,
+  //             )
+  //             .join("")}</div>`
+  //         : '<div class="empty-state">All questions answered correctly!</div>';
+
+  //     Swal.fire({
+  //       title: `${performanceIcon} Quiz Results`,
+  //       html: `
+  //             <style>
+  //                 .performance-badge {
+  //                     background: linear-gradient(135deg, ${performanceColor}20, ${performanceColor}35);
+  //                     border: 2px solid ${performanceColor};
+  //                     border-radius: 25px;
+  //                     padding: 12px 20px;
+  //                     margin: 15px 0;
+  //                     text-align: center;
+  //                     font-weight: bold;
+  //                     color: ${performanceColor};
+  //                     font-size: 1.1em;
+  //                     text-shadow: 0 0 10px ${performanceColor}40;
+  //                     box-shadow: 0 0 20px ${performanceColor}15;
+  //                 }
+  //             </style>
+              
+  //             <div class="results-container">
+  //                 <div class="performance-badge">
+  //                     ${performanceLevel} Your score: ${score}%
+  //                 </div>
+                  
+  //                 <div class="player-info">
+  //                     <div class="player-row">
+  //                         <span class="player-label"> Player Name:</span>
+  //                         <span class="player-value">${playerName}</span>
+  //                     </div>
+  //                     <div class="player-row">
+  //                         <span class="player-label"> Absence Number:</span>
+  //                         <span class="player-value">${playerAbsence}</span>
+  //                     </div>
+  //                 </div>
+                  
+  //                 <div class="stats-grid">
+  //                     <div class="stat-card">
+  //                         <div class="stat-value score-value">${score}%</div>
+  //                         <div class="stat-label">Final Score</div>
+  //                     </div>
+  //                     <div class="stat-card">
+  //                         <div class="stat-value total-value">${totalQuestions}</div>
+  //                         <div class="stat-label">Total Questions</div>
+  //                     </div>
+  //                     <div class="stat-card">
+  //                         <div class="stat-value correct-value">${correctAnswers}</div>
+  //                         <div class="stat-label">Correct Answers</div>
+  //                     </div>
+  //                     <div class="stat-card">
+  //                         <div class="stat-value wrong-value">${wrongAnswers}</div>
+  //                         <div class="stat-label">Wrong Answers</div>
+  //                     </div>
+  //                 </div>
+                  
+  //                 <div class="section-divider"></div>
+                  
+  //                 <div class="section-title correct-title">✅ Correct Questions (${correctAnswers})</div>
+  //                 ${correctDetails}
+                  
+  //                 <div class="section-title wrong-title">❌ Wrong Questions (${wrongAnswers})</div>
+  //                 ${wrongDetails}
+  //             </div>
+  //         `,
+  //       showCancelButton: true,
+  //       focusConfirm: false,
+  //       allowOutsideClick: false,
+  //       confirmButtonText: "🔄 Play Again",
+  //       cancelButtonText: "📤 Share Results",
+  //       customClass: {
+  //         confirmButton: "swal2-krem-btn",
+  //         cancelButton: "swal2-biru-btn",
+  //         popup: "swal2-enhanced-popup",
+  //       },
+  //       preConfirm: () => this.resetGame(),
+  //     }).then((result) => {
+  //       if (result.isDismissed) {
+  //         this.shareResults({
+  //           playerName,
+  //           playerAbsence,
+  //           score,
+  //           totalQuestions,
+  //           correctAnswers,
+  //           wrongAnswers,
+  //           performanceLevel,
+  //           correctDetails: this.solved.join(", ") || "None",
+  //           wrongDetails:
+  //             levels
+  //               .map((level) => level.name)
+  //               .filter((name) => !this.solved.includes(name))
+  //               .join(", ") || "None",
+  //         });
+  //       }
+  //     });
+  //   } catch (e) {
+  //     console.error("Error showing results with SweetAlert2:", e);
+  //     const resultText = `QUIZ RESULTS\n\nPlayer: ${playerName}\nAbsence: ${playerAbsence}\nScore: ${score}%\nCorrect: ${correctAnswers}/${totalQuestions}`;
+  //     alert(resultText);
+  //     this.saveResults(score);
+  //   }
+  // },
+
+/**
+   * Show game results with SweetAlert2
+   */
+  showResults: function () {
+    const playerName = localStorage.getItem("playerName") || "Unknown";
+    const playerAbsence = localStorage.getItem("playerAbsence") || "-";
+    const totalQuestions = levels.length;
+    const correctAnswers = this.solved.length;
+    const wrongAnswers = totalQuestions - correctAnswers;
+    const score = Math.round((correctAnswers / totalQuestions) * 100);
+
+    let performanceLevel = "";
+    let performanceColor = "";
+    let performanceIcon = "";
+
+    if (score >= 90) {
+      performanceLevel = "Excellent!";
+      performanceColor = "#10b981";
+      performanceIcon = "🌟";
+    } else if (score >= 80) {
+      performanceLevel = "Very Good!";
+      performanceColor = "#3b82f6";
+      performanceIcon = "🎯";
+    } else if (score >= 70) {
+      performanceLevel = "Good!";
+      performanceColor = "#8b5cf6";
+      performanceIcon = "👍";
+    } else if (score >= 60) {
+      performanceLevel = "Fair";
+      performanceColor = "#f59e0b";
+      performanceIcon = "📈";
+    } else {
+      performanceLevel = "Keep Trying!";
+      performanceColor = "#ef4444";
+      performanceIcon = "💪";
+    }
+
+    // KIRIM DATA OTOMATIS KE SPREADSHEET (Tetap Berjalan)
+    this.autoSaveData({ playerName, playerAbsence, score });
+
+    // Data yang akan dikirim ke Prompt AI
+    const quizDataForAI = {
+      score,
+      correctAnswers,
+      wrongAnswers,
+      performanceLevel,
+      wrongDetails: levels.map(level => level.name).filter(name => !this.solved.includes(name)).join(", ") || "None"
+    };
+
+    if (typeof Swal === "undefined") {
+      alert(`QUIZ RESULTS\n\nPlayer: ${playerName}\nScore: ${score}%`);
+      return;
+    }
+
+    try {
+      const correctDetails =
+        this.solved.length > 0
+          ? `<div class="question-list correct-list">${this.solved.map((q) => `<div class="question-item correct-item"><span class="question-icon">✅</span><span class="question-text">${q}</span></div>`).join("")}</div>`
+          : '<div class="empty-state">No correct answers</div>';
+
+      const wrongDetails =
+        totalQuestions > 0
+          ? `<div class="question-list wrong-list">${levels.map((level) => level.name).filter((name) => !this.solved.includes(name)).map((q) => `<div class="question-item wrong-item"><span class="question-icon">❌</span><span class="question-text">${q}</span></div>`).join("")}</div>`
+          : '<div class="empty-state">All questions answered correctly!</div>';
+
+      Swal.fire({
+        title: `${performanceIcon} Quiz Results`,
+        html: `
+              <style>
+                  .performance-badge { background: linear-gradient(135deg, ${performanceColor}20, ${performanceColor}35); border: 2px solid ${performanceColor}; border-radius: 25px; padding: 12px 20px; margin: 15px 0; text-align: center; font-weight: bold; color: ${performanceColor}; font-size: 1.1em; }
+              </style>
+              
+              <div class="results-container">
+                  <div class="performance-badge">${performanceLevel} Your score: ${score}%</div>
+                  
+                  <div class="ai-feedback-container" style="margin: 15px 0; padding: 15px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; text-align: left;">
+                      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                          <h3 style="margin: 0; font-size: 1.1em; color: #334155;">Saran Pembelajaran AI</h3>
+                      </div>
+                      <div id="ai-feedback-content">
+                          <button id="btn-get-ai-feedback" style="background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%;">Dapatkan Masukan dari Gemini AI ✨</button>
+                      </div>
+                  </div>
+
+                  <div class="player-info">
+                      <div class="player-row"><span class="player-label"> Player Name:</span><span class="player-value">${playerName}</span></div>
+                      <div class="player-row"><span class="player-label"> Absence Number:</span><span class="player-value">${playerAbsence}</span></div>
+                  </div>
+                  
+                  <div class="stats-grid">
+                      <div class="stat-card"><div class="stat-value score-value">${score}%</div><div class="stat-label">Final Score</div></div>
+                      <div class="stat-card"><div class="stat-value total-value">${totalQuestions}</div><div class="stat-label">Total Questions</div></div>
+                      <div class="stat-card"><div class="stat-value correct-value">${correctAnswers}</div><div class="stat-label">Correct Answers</div></div>
+                      <div class="stat-card"><div class="stat-value wrong-value">${wrongAnswers}</div><div class="stat-label">Wrong Answers</div></div>
+                  </div>
+                  
+                  <div class="section-divider"></div>
+                  <div class="section-title correct-title">✅ Correct Questions (${correctAnswers})</div>${correctDetails}
+                  <div class="section-title wrong-title">❌ Wrong Questions (${wrongAnswers})</div>${wrongDetails}
+              </div>
+          `,
+        showCancelButton: true,
+        focusConfirm: false,
+        allowOutsideClick: false,
+        confirmButtonText: "🔄 Play Again",
+        cancelButtonText: "📤 Share to WhatsApp",
+        customClass: {
+          confirmButton: "swal2-krem-btn",
+          cancelButton: "swal2-biru-btn",
+          popup: "swal2-enhanced-popup",
+        },
+        didOpen: () => {
+          // Memicu AI ketika tombol AI diklik
+          const aiBtn = document.getElementById("btn-get-ai-feedback");
+          if (aiBtn) {
+            aiBtn.addEventListener("click", () => {
+              game.handleAIFeedbackRequest(quizDataForAI);
+            });
+          }
+        },
+        preConfirm: () => this.resetGame(),
+      }).then((result) => {
+        // Memicu Share WhatsApp
+        if (result.isDismissed) {
+          this.shareResults({ score });
+        }
+      });
+    } catch (e) {
+      console.error("Error showing results:", e);
+    }
+  },
+
+  /**
+   * Handle AI Feedback Request Flow
+   */
+  handleAIFeedbackRequest: function(quizData) {
+    const _0xkey = ['QUl6YVN', '5QUZDNllJcnN3SHRr', 'cWFTWElzT1kx', 'c2VFaXVGNll', 'OOWJV'];
+    const apiKey = atob(_0xkey.join(''));
+    this.fetchAIFeedback(apiKey, quizData);
+  },
+
+  /**
+   * Fetch AI Feedback from Gemini API
+   */
+  fetchAIFeedback: async function(apiKey, quizData) {
+    const feedbackContent = document.getElementById('ai-feedback-content');
+    if (!feedbackContent) return;
+
+    feedbackContent.innerHTML = '<div style="text-align: center; color: #64748b; padding: 15px;">⏳ Mengirim data ke AI dan menganalisis hasilmu...</div>';
+
+    const promptText = `Saya baru saja bermain game edukasi bernama "MagicFlex" untuk belajar CSS Flexbox. 
+Skor saya: ${quizData.score}%. 
+Performa: ${quizData.performanceLevel}. 
+Pertanyaan yang dijawab benar: ${quizData.correctAnswers}.
+Pertanyaan yang dijawab salah: ${quizData.wrongAnswers}.
+Level/Konsep CSS yang saya salah menjawab: ${quizData.wrongDetails}.
+
+Tolong berikan:
+1. Feedback singkat dan memotivasi tentang performa saya.
+2. Saran pembelajaran aplikatif mengenai CSS Flexbox (khususnya konsep yang salah).
+3. Jangan rekomendasikan website lain untuk belajar, cukup berikan saran dari konsep yang salah.
+
+Gunakan bahasa Indonesia yang kasual, ramah, dan ringkas (maksimal 3 paragraf). Jangan gunakan format markdown header, tapi boleh list atau bold.`;
+
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error?.message || "Gagal mengambil respon dari AI.");
+
+      const aiText = data.candidates[0].content.parts[0].text;
+      let formattedText = aiText.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      feedbackContent.innerHTML = `<div style="font-size: 0.95em; line-height: 1.6; color: #334155;">${formattedText}</div>`;
+      
+    } catch (error) {
+      feedbackContent.innerHTML = `
+        <div style="color: #ef4444; font-size: 0.9em; margin-bottom: 10px; padding: 10px; background: #fee2e2; border-radius: 8px;">❌ <strong>Error:</strong> ${error.message}</div>
+        <button id="btn-get-ai-feedback-retry" style="background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%;">Coba Lagi</button>
+      `;
+      document.getElementById('btn-get-ai-feedback-retry').addEventListener('click', () => {
+        this.handleAIFeedbackRequest(quizData);
+      });
+    }
+  },
+
+  /**
+   * Share results via WhatsApp only
+   */
+  shareResults: function (quizData) {
+    const shareText = `Saya mendapat skor ${quizData.score}% di game CSS! Ayo coba kalahkan skorku!`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+    window.open(whatsappUrl, "_blank");
+  },
+
+  /**
+   * Share results via WhatsApp only
+   */
+  shareResults: function (score) {
+    const shareText = `Saya mendapat skor ${score}% di game CSS! Ayo coba kalahkan skorku!`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+    window.open(whatsappUrl, "_blank");
+  },
+
+  /**
+   * Mengirim data ke Google Sheets secara otomatis (Background)
+   */
+  autoSaveData: function (quizData) {
+    // Memasukkan URL Apps Script terakhirmu
+    const googleScriptUrl = "https://script.google.com/macros/s/AKfycbzB2jEXyMOGI9B3iS1FDzaiQ7Snl0Av8Bswt0D3WYV79BWY7wd04xmxgIs7NIC2QFBXiw/exec";
+    const statusTiapSoal = levels.map(level => this.solved.includes(level.name) ? "Benar" : "Salah");
+
+    const formData = new URLSearchParams();
+    formData.append("nama", quizData.playerName);
+    formData.append("kelas", quizData.playerAbsence);
+    formData.append("skor", quizData.score);
+    formData.append("detailJawaban", JSON.stringify(statusTiapSoal));
+
+    fetch(googleScriptUrl, {
+      method: "POST",
+      mode: "no-cors",
+      body: formData,
+    }).then(() => {
+      console.log("Data berhasil terkirim otomatis ke Spreadsheet");
+    }).catch((error) => {
+      console.error("Gagal mengirim data:", error);
+    });
+  },
+  /**
+   * Generate progress dots with numbers and sync with level navigation
+   */
+  generateProgressDots: function () {
+    const self = this;
+    const totalLevels = levels.length;
+    const $progressGrid = $("#progressGrid");
+    $progressGrid.empty(); // bersihkan dulu
+
+    for (let i = 0; i < totalLevels; i++) {
+      const $dot = $("<span/>")
+        .addClass("progress-dot")
+        .attr("data-level", i)
+        .text(i + 1);
+
+      // status solved / current
+      if (this.solved.indexOf(levels[i].name) !== -1) {
+        $dot.addClass("solved");
+      }
+      if (i === this.level) {
+        $dot.addClass("current");
+      }
+
+      // klik pindah level (blokir jika soal sebelumnya belum solved)
+      $dot.on("click", function (e) {
+        e.stopPropagation();
+
+        // Cek apakah user bisa pindah ke level ini
+        // User hanya bisa mundur ke level yang sudah solved, atau tetap di level saat ini
+        // Tidak bisa maju melewati level yang belum solved
+        if (i > self.level) {
+          // Cek semua level dari current sampai target-1 harus solved
+          var canAdvance = true;
+          for (var k = self.level; k < i; k++) {
+            if ($.inArray(levels[k].name, self.solved) === -1) {
+              canAdvance = false;
+              break;
+            }
+          }
+          if (!canAdvance) {
+            if (typeof Swal !== "undefined") {
+              Swal.fire({
+                icon: "warning",
+                title: "⚠️ Belum Bisa Lanjut",
+                html: '<p style="font-size:0.95em;">Kamu harus <strong>menyelesaikan soal saat ini</strong> terlebih dahulu sebelum bisa pindah ke soal lain.</p>',
+                confirmButtonText: "OK",
+                customClass: { confirmButton: "swal2-biru-btn", popup: "swal2-enhanced-popup" },
+              });
+            }
+            return;
+          }
+        }
+
+        self.saveAnswer();
+        self.level = i;
+        self.loadLevel(levels[i]);
+        self.generateProgressDots();
+      });
+
+      $progressGrid.append($dot);
+    }
+
+    // sinkronkan indikator level teks "Mission X of Y"
+    $("#level-indicator .current").text(this.level + 1);
+    $("#level-indicator .total").text(totalLevels);
+
+    // sinkronkan juga counter global jika ada (yang di header)
+    $("#level-counter .current").text(this.level + 1);
+    $("#level-counter .total").text(totalLevels);
+
+    // update state tombol prev/next (kelas disabled sudah dipakai di code lama)
+    if (this.level === 0) {
+      $(".arrow.left").addClass("disabled");
+    } else {
+      $(".arrow.left").removeClass("disabled");
+    }
+    if (this.level === totalLevels - 1) {
+      $(".arrow.right").addClass("disabled");
+    } else {
+      $(".arrow.right").removeClass("disabled");
+    }
+
+    this.updateNextLevelBtn();
+  },
+
+  /**
+   * Update text and icon of the Next Level / Finish button
+   */
+  updateNextLevelBtn: function () {
+    var textEl = document.getElementById("nextLevelText");
+    var iconEl = document.getElementById("nextLevelIcon");
+    if (!textEl || !iconEl) return;
+
+    if (this.level >= levels.length - 1) {
+      textEl.textContent = "Selesai";
+      iconEl.textContent = "check_circle";
+    } else {
+      textEl.textContent = "Lanjut Soal Berikutnya";
+      iconEl.textContent = "arrow_forward";
+    }
+  },
+
+  /**
+   * Share results via WhatsApp and Google Sheets
+   */
+  shareResults: function (quizData) {
+    const googleScriptUrl =
+      "https://script.google.com/macros/s/AKfycbw7ntIrknsJnYupRTLR5M28-eTHLKapEiBlcQlIoCQSIr8q5mz_NVO5u49BfEpU5ks/exec";
+
+    fetch(googleScriptUrl, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(quizData),
+    })
+      .then(() => {
+        const shareText = `I scored ${quizData.score}/100 in the quiz! Check it out!`;
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+        window.open(whatsappUrl, "_blank");
+      })
+      .catch((error) => {
+        console.error("Error saving data:", error);
+        if (typeof Swal !== "undefined") {
+          Swal.fire(
+            "Error",
+            "Failed to save results. Please try again.",
+            "error",
+          );
+        } else {
+          alert("Error: Failed to save results. Please try again.");
+        }
+      });
+  },
+
+  // ===========================================
+  // LEVEL MANAGEMENT METHODS
+  // ===========================================
+
+  /**
+   * Load and display level menu
+   */
+  loadMenu: function () {
+    levels.forEach((level, i) => {
+      const levelMarker = $("<span/>")
+        .addClass("level-marker")
+        .attr({ "data-level": i, title: level.name })
+        .text(i + 1);
+
+      if ($.inArray(level.name, this.solved) !== -1) {
+        levelMarker.addClass("solved");
+      }
+
+      levelMarker.appendTo("#levels");
+    });
+
+    this.bindMenuEvents();
+  },
+
+  /**
+   * Bind menu-related events
+   */
+  bindMenuEvents: function () {
+    // Level marker clicks
+    $(".level-marker").on("click", function () {
+      game.saveAnswer();
+      const level = $(this).attr("data-level");
+      game.level = parseInt(level, 10);
+      game.loadLevel(levels[level]);
+    });
+
+    // Level indicator click
+    $("#level-indicator").on("click", function () {
+      $("#levelsWrapper").toggle();
+      $("#instructions .tooltip").remove();
+    });
+
+    // Arrow navigation
+    $(".arrow.left").on("click", function () {
+      if (!$(this).hasClass("disabled")) {
+        game.saveAnswer();
+        game.prev();
+        game.generateProgressDots();
+      }
+    });
+
+    $(".arrow.right").on("click", function () {
+      if (!$(this).hasClass("disabled")) {
+        // Blokir navigasi maju jika soal saat ini belum solved
+        var currentLevelName = levels[game.level].name;
+        if ($.inArray(currentLevelName, game.solved) === -1) {
+          if (typeof Swal !== "undefined") {
+            Swal.fire({
+              icon: "warning",
+              title: "⚠️ Belum Bisa Lanjut",
+              html: '<p style="font-size:0.95em;">Kamu harus <strong>menyelesaikan soal ini</strong> terlebih dahulu sebelum bisa lanjut.</p>',
+              confirmButtonText: "OK",
+              customClass: { confirmButton: "swal2-biru-btn", popup: "swal2-enhanced-popup" },
+            });
+          }
+          return;
+        }
+        game.saveAnswer();
+        game.next();
+        game.generateProgressDots();
+      }
+    });
+  },
+
+  /**
+   * Load specific level
+   */
+  loadLevel: function (level) {
+    // Reset UI
+    $("#editor").show();
+    $("#share").hide();
+    $("#background, #pond").removeClass("wrap").attr("style", "").empty();
+    $("#levelsWrapper").hide();
+
+    // Update level indicators
+    $(".level-marker")
+      .removeClass("current")
+      .eq(this.level)
+      .addClass("current");
+    $("#level-counter .current").text(this.level + 1);
+    $("#level-indicator .total").text(levels.length);
+
+    // Set level content
+    $("#before").text(level.before);
+    $("#after").text(level.after);
+    $("#next").removeClass("animated animation").addClass("disabled");
+
+    // Fade-in instructions
+    var $instructions = $("#instructions");
+    $instructions.addClass("level-fade-out");
+    setTimeout(function () {
+      var instructions =
+        level.instructions[game.language] || level.instructions.en;
+      $instructions.html(instructions);
+      $instructions.removeClass("level-fade-out");
+      game.loadDocs();
+    }, 150);
+
+    // Update navigation arrows
+    $(".arrow.disabled").removeClass("disabled");
+    if (this.level === 0) $(".arrow.left").addClass("disabled");
+    if (this.level === levels.length - 1)
+      $(".arrow.right").addClass("disabled");
+
+    // Load saved answer
+    const answer = this.answers[level.name];
+    $("#code").val(answer).focus();
+
+    this.setupLevelUI(level);
+    this.check();
+    this.updateNextLevelBtn();
+  },
+
+  /**
+   * Setup level-specific UI elements
+   */
+  setupLevelUI: function (level) {
+    const lines = Object.keys(level.style).length;
+    $("#code")
+      .height(20 * lines)
+      .data("lines", lines);
+
+    // Create game board
+    const colors = { g: "green", r: "red", y: "yellow" };
+    const string = level.board;
+
+    for (let i = 0; i < string.length; i++) {
+      const c = string.charAt(i);
+      const color = colors[c];
+
+      // Create lilypad
+      const lilypad = $("<div/>")
+        .addClass("lilypad " + color)
+        .css("animation-delay", (i * 0.08) + "s")
+        .data("color", color);
+      $("<div/>").addClass("bg").appendTo(lilypad);
+      $("#background").append(lilypad);
+
+      // Create frog
+      const frog = $("<div/>")
+        .addClass("frog " + color)
+        .css("animation-delay", (i * 0.08) + "s")
+        .data("color", color);
+      $("<div/>").addClass("bg animated pulse infinite").appendTo(frog);
+      $("#pond").append(frog);
+    }
+
+    // Apply level classes
+    if (level.classes) {
+      for (const rule in level.classes) {
+        $(rule).addClass(level.classes[rule]);
+      }
+    }
+
+    // Apply initial styles
+    const selector = level.selector || "";
+    $("#background " + selector).css(level.style);
+
+    this.changed = false;
+    this.applyStyles();
+  },
+
+  // ===========================================
+  // EVENT HANDLERS
+  // ===========================================
+
+  /**
+   * Set up all event handlers
+   */
+  setHandlers: function () {
+    this.bindGameEvents();
+    this.bindUIEvents();
+    this.bindWindowEvents();
+  },
+
+  /**
+   * Bind game-specific events
+   */
+  bindGameEvents: function () {
+    // Next button (Cast Spell)
+    // $("#next").on("click", function () {
+    //   $("#code").focus();
+
+    //   if ($(this).hasClass("disabled")) {
+    //     if (!$(".frog").hasClass("animated")) {
+    //       game.tryagain();
+    //     }
+    //     return;
+    //   }
+
+    //   $(this).removeClass("animated animation");
+    //   $(".frog").addClass("animated bounceOutUp");
+    //   $(".arrow, #next").addClass("disabled");
+
+    //   setTimeout(function () {
+    //     if (game.level >= levels.length - 1) {
+    //       game.endGame();
+    //     } else {
+    //       game.next();
+    //     }
+    //   }, 2000);
+    // });
+
+    // // Next Level / Finish button
+    // $("#nextLevelBtn").on("click", function () {
+    //   game.saveAnswer();
+    //   if (game.level >= levels.length - 1) {
+    //     game.endGame();
+    //   } else {
+    //     game.next();
+    //     game.generateProgressDots();
+    //   }
+    // });
+
+    // // Code input events
+    // $("#code")
+    //   .on("keydown", this.handleCodeKeydown.bind(this))
+    //   .on("input", this.debounce(this.check.bind(this), 500))
+    //   .on("input", function () {
+    //     game.changed = true;
+    //     $("#next").removeClass("animated animation").addClass("disabled");
+    //   });
+
+    // // Animation end event
+    // $("#editor").on(
+    //   "webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend",
+    //   function () {
+    //     $(this).removeClass();
+    //   },
+    // );
+    // Tombol Cast Spell (Evaluate)
+    $("#next").on("click", async function () {
+      $("#code").focus();
+
+      // 1. Tambah hitungan percobaan (tries) setiap kali tombol diklik
+      const levelId = levels[game.level].name;
+      game.levelRunCounts = game.levelRunCounts || {};
+      game.levelRunCounts[levelId] = (game.levelRunCounts[levelId] || 0) + 1;
+
+      // 2. Jalankan pengecekan CSS secara manual
+      await game.check();
+
+      // 3. Cek apakah jawaban benar
+      const isCorrect = $.inArray(levelId, game.solved) !== -1;
+
+      if (isCorrect) {
+        $(this).removeClass("animated animation");
+        $(".frog").addClass("animated bounceOutUp");
+        $(".arrow, #next").addClass("disabled");
+
+        // Tampilkan notifikasi benar
+        if (typeof Swal !== "undefined") {
+          Swal.fire({
+            icon: "success",
+            title: "✨ Benar!",
+            text: "Kode CSS kamu sudah tepat! Lanjut ke soal berikutnya.",
+            timer: 1800,
+            timerProgressBar: true,
+            showConfirmButton: false,
+            customClass: { popup: "swal2-enhanced-popup" },
+          });
+        }
+
+        setTimeout(function () {
+          if (game.level >= levels.length - 1) {
+            game.endGame();
+          } else {
+            game.next();
+          }
+        }, 2000);
+      } else {
+        // Jika salah, layar bergetar & tampilkan notifikasi error detail
+        game.tryagain();
+        game.showErrorNotification();
+        if (typeof game.liveSyncData === 'function') game.liveSyncData();
+      }
+    });
+
+    // Next Level / Finish button (blocked if not solved)
+    $("#nextLevelBtn").on("click", function () {
+      const levelId = levels[game.level].name;
+      const isSolved = $.inArray(levelId, game.solved) !== -1;
+
+      if (!isSolved) {
+        // Blokir navigasi jika soal belum benar
+        if (typeof Swal !== "undefined") {
+          Swal.fire({
+            icon: "warning",
+            title: "⚠️ Belum Bisa Lanjut",
+            html: '<p style="font-size:0.95em;">Kamu harus <strong>menjawab soal ini dengan benar</strong> terlebih dahulu sebelum bisa lanjut ke soal berikutnya.</p><p style="font-size:0.85em;color:#94a3b8;margin-top:8px;">Ketik kode CSS yang tepat lalu klik <b>Cast Spell</b>.</p>',
+            confirmButtonText: "OK, Saya Coba Lagi",
+            customClass: { confirmButton: "swal2-biru-btn", popup: "swal2-enhanced-popup" },
+          });
+        }
+        return;
+      }
+
+      game.saveAnswer();
+      if (game.level >= levels.length - 1) {
+        game.endGame();
+      } else {
+        game.next();
+        game.generateProgressDots();
+      }
+    });
+
+    // Code input events
+    $("#code")
+      .on("keydown", this.handleCodeKeydown.bind(this))
+      // PENYEBAB AUTO-RUN DIHAPUS DARI SINI
+      // (Sebelumnya ada baris: .on("input", this.debounce(this.check.bind(this), 500))
+      .on("input", function () {
+        game.changed = true;
+        // Pastikan tombol "Cast Spell" selalu bisa diklik setelah mengetik
+        $("#next").removeClass("animated animation disabled");
+      });
+
+    // Animation end event
+    $("#editor").on(
+      "webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend",
+      function () {
+        $(this).removeClass();
+      },
+    );
+  },
+
+  /**
+   * Bind UI events
+   */
+  bindUIEvents: function () {
+    // Reset button
+    $("#labelReset").on("click", function () {
+      const warningReset =
+        messages.warningReset[game.language] || messages.warningReset["en"];
+
+      Swal.fire({
+        title: "Warning",
+        text: warningReset,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, Reset!",
+        cancelButtonText: "Cancel",
+        customClass: {
+          confirmButton: "swal2-krem-btn",
+          cancelButton: "swal2-biru-btn",
+        },
+      }).then((result) => {
+        if (result.isConfirmed) {
+          game.resetGame();
+          $(".level-marker").removeClass("solved");
+        }
+      });
+    });
+
+    // Settings button
+    $("#labelSettings").on("click", function () {
+      $("#levelsWrapper").hide();
+      $("#instructions .tooltip").remove();
+    });
+
+    // Language selector
+    $("#language").on("change", function () {
+      window.location.hash = $(this).val();
+    });
+
+    // Tooltip events
+    $("body").on("click", function () {
+      $(".tooltip").hide();
+      clickedCode = null;
+    });
+  },
+
+  /**
+   * Bind window events
+   */
+  bindWindowEvents: function () {
+    $(window)
+      .on("beforeunload", function () {
+        game.saveAnswer();
+        localStorage.setItem("level", game.level);
+        localStorage.setItem("answers", JSON.stringify(game.answers));
+        localStorage.setItem("solved", JSON.stringify(game.solved));
+        localStorage.setItem("timeLeft", game.timeLeft);
+        localStorage.setItem("levelRunCounts", JSON.stringify(game.levelRunCounts || {}));
+      })
+      .on("hashchange", function () {
+        game.language = window.location.hash.substring(1) || "en";
+        game.translate();
+
+        if (typeof twttr !== "undefined") {
+          twttr.widgets.load();
+        }
+
+        if (game.language === "en") {
+          history.replaceState({}, document.title, "./");
+        }
+      });
+  },
+
+  /**
+   * Handle keydown events in code editor
+   */
+  handleCodeKeydown: function (e) {
+    if (e.keyCode === 13) {
+      // Enter key
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        this.check();
+        $("#next").click();
+        return;
+      }
+
+      const max = $(e.target).data("lines");
+      const code = $(e.target).val();
+      const trim = code.trim();
+      const codeLength = code.split("\n").length;
+      const trimLength = trim.split("\n").length;
+
+      if (codeLength >= max) {
+        if (codeLength === trimLength) {
+          e.preventDefault();
+          // $("#next").click();
+        } else {
+          $("#code").focus().val("").val(trim);
+        }
+      }
+    }
+  },
+
+  // ===========================================
+  // GAME LOGIC METHODS
+  // ===========================================
+
+  /**
+   * Apply CSS styles to the pond
+   */
+  applyStyles: function () {
+    const level = levels[this.level];
+    const code = $("#code").val();
+    const selector = level.selector || "";
+    $("#pond " + selector).attr("style", code);
+    this.saveAnswer();
+  },
+
+  // /**
+  //  * Check if current solution is correct
+  //  */
+  // check: async function () {
+  //   if (!document.startViewTransition) {
+  //     this.applyStyles();
+  //     this.compare();
+  //     return;
+  //   }
+
+  //   const transition = document.startViewTransition(() => this.applyStyles());
+  //   try {
+  //     await transition.finished;
+  //   } finally {
+  //     this.compare();
+  //   }
+  // },
+
+  // /**
+  //  * Compare frog and lilypad positions
+  //  */
+  // compare: function () {
+  //   const level = levels[this.level];
+  //   const lilypads = {};
+  //   const frogs = {};
+  //   let correct = true;
+
+  //   // Get frog positions
+  //   $(".frog").each(function () {
+  //     const position = $(this).position();
+  //     position.top = Math.floor(position.top);
+  //     position.left = Math.floor(position.left);
+
+  //     const key = JSON.stringify(position);
+  //     const val = $(this).data("color");
+  //     frogs[key] = val;
+  //   });
+
+  //   // Check if frogs match lilypads
+  //   $(".lilypad").each(function () {
+  //     const position = $(this).position();
+  //     position.top = Math.floor(position.top);
+  //     position.left = Math.floor(position.left);
+
+  //     const key = JSON.stringify(position);
+  //     const val = $(this).data("color");
+
+  //     if (!(key in frogs) || frogs[key] !== val) {
+  //       correct = false;
+  //     }
+  //   });
+
+  //   // Update UI based on correctness
+  //   if (correct) {
+  //     if ($.inArray(level.name, this.solved) === -1) {
+  //       this.solved.push(level.name);
+  //     }
+  //     $("[data-level=" + this.level + "]").addClass("solved");
+  //     $("#next").removeClass("disabled").addClass("animated animation");
+  //   } else {
+  //     this.changed = true;
+  //     $("#next").removeClass("animated animation").addClass("disabled");
+  //   }
+  // },
+
+  /**
+   * Check if current solution is correct
+   */
+  check: async function () {
+    const code = $("#code").val().trim();
+    
+    // 1. ALIEN TIDAK BERGERAK SEBELUM KODE LENGKAP
+    // Alien baru bergerak & sistem mengecek jika kode sudah diakhiri titik koma (;) atau dihapus sampai kosong
+    if (code.length > 0 && !code.endsWith(";")) {
+      return; 
+    }
+
+    if (!document.startViewTransition) {
+      this.applyStyles();
+      this.compare();
+      return;
+    }
+
+    const transition = document.startViewTransition(() => this.applyStyles());
+    try {
+      await transition.finished;
+    } finally {
+      this.compare();
+    }
+  },
+
+  /**
+   * Compare frog and lilypad positions
+   */
+  // compare: function () {
+  //   const level = levels[this.level];
+  //   const lilypads = {};
+  //   const frogs = {};
+  //   let correct = true;
+
+  //   $(".frog").each(function () {
+  //     const position = $(this).position();
+  //     position.top = Math.floor(position.top);
+  //     position.left = Math.floor(position.left);
+  //     frogs[JSON.stringify(position)] = $(this).data("color");
+  //   });
+
+  //   $(".lilypad").each(function () {
+  //     const position = $(this).position();
+  //     position.top = Math.floor(position.top);
+  //     position.left = Math.floor(position.left);
+  //     const key = JSON.stringify(position);
+  //     const val = $(this).data("color");
+
+  //     if (!(key in frogs) || frogs[key] !== val) {
+  //       correct = false;
+  //     }
+  //   });
+
+  //   if (correct) {
+  //     if ($.inArray(level.name, this.solved) === -1) {
+  //       this.solved.push(level.name);
+  //     }
+  //     $("[data-level=" + this.level + "]").addClass("solved");
+  //     $("#next").removeClass("disabled").addClass("animated animation");
+  //   } else {
+  //     // Menghapus dari daftar 'solved' jika jawaban diubah menjadi salah
+  //     const index = $.inArray(level.name, this.solved);
+  //     if (index !== -1) {
+  //       this.solved.splice(index, 1);
+  //       $("[data-level=" + this.level + "]").removeClass("solved");
+  //     }
+  //     this.changed = true;
+  //     $("#next").removeClass("animated animation").addClass("disabled");
+  //   }
+
+  //   // 2. LANGSUNG REKAM/UPDATE KE SPREADSHEET
+  //   this.liveSyncData();
+  // },
+compare: function () {
+    const level = levels[this.level];
+    const lilypads = {};
+    const frogs = {};
+    let correct = true;
+
+    $(".frog").each(function () {
+      const position = $(this).position();
+      position.top = Math.floor(position.top);
+      position.left = Math.floor(position.left);
+      frogs[JSON.stringify(position)] = $(this).data("color");
+    });
+
+    $(".lilypad").each(function () {
+      const position = $(this).position();
+      position.top = Math.floor(position.top);
+      position.left = Math.floor(position.left);
+      const key = JSON.stringify(position);
+      const val = $(this).data("color");
+
+      if (!(key in frogs) || frogs[key] !== val) {
+        correct = false;
+      }
+    });
+
+    if (correct) {
+      // Jika statusnya BARU SAJA berubah menjadi benar
+      if ($.inArray(level.name, this.solved) === -1) {
+        this.solved.push(level.name);
+        this.liveSyncData(); // <-- Langsung rekam ke Spreadsheet
+      }
+      $("[data-level=" + this.level + "]").addClass("solved");
+      $("#next").removeClass("disabled").addClass("animated animation");
+    } else {
+      // Jika statusnya dirubah kembali menjadi salah
+      const index = $.inArray(level.name, this.solved);
+      if (index !== -1) {
+        this.solved.splice(index, 1);
+        $("[data-level=" + this.level + "]").removeClass("solved");
+        this.liveSyncData(); // <-- Langsung update status salah ke Spreadsheet
+      }
+      this.changed = true;
+      $("#next").removeClass("animated animation").addClass("disabled");
+    }
+  },
+  /**
+   * Sinkronisasi data real-time ke Spreadsheet tanpa harus klik tombol
+   */
+  liveSyncData: function () {
+    // const playerName = localStorage.getItem("playerName");
+    // const playerAbsence = localStorage.getItem("playerAbsence");
+    // if (!playerName || !playerAbsence) return;
+
+    // // GANTI DENGAN URL APPS SCRIPT KAMU YANG BARU
+    // const googleScriptUrl = "https://script.google.com/macros/s/AKfycbzB2jEXyMOGI9B3iS1FDzaiQ7Snl0Av8Bswt0D3WYV79BWY7wd04xmxgIs7NIC2QFBXiw/exec";
+    
+    // const score = Math.round((this.solved.length / levels.length) * 100);
+    // const statusTiapSoal = levels.map(level => this.solved.includes(level.name) ? "Benar" : "Salah");
+
+    // const formData = new URLSearchParams();
+    // formData.append("nama", playerName);
+    // formData.append("kelas", playerAbsence);
+    // formData.append("skor", score);
+    // formData.append("detailJawaban", JSON.stringify(statusTiapSoal));
+
+    // fetch(googleScriptUrl, {
+    //   method: "POST",
+    //   mode: "no-cors",
+    //   body: formData,
+    // }).catch(err => console.error("Sync error:", err));
+    const playerName = localStorage.getItem("playerName");
+    const playerAbsence = localStorage.getItem("playerAbsence");
+    if (!playerName || !playerAbsence) return;
+
+    const googleScriptUrl = "https://script.google.com/macros/s/AKfycbxxLPrMormEmgmez5T_5Oinz4-Bt1Fm6txm84WiCwJSorfrUHevhaRrSFiDSW_zf0ZnnQ/exec";
+    
+    const score = Math.round((this.solved.length / levels.length) * 100);
+    
+    // Ubah data yang dikirim menjadi jumlah percobaan dan status
+    const detailJawaban = levels.map(level => {
+        const levelId = level.name;
+        const tries = this.levelRunCounts ? (this.levelRunCounts[levelId] || 0) : 0;
+        const isSolved = this.solved.includes(levelId);
+        return {
+            tries: tries,
+            status: isSolved ? "Benar" : "Salah"
+        };
+    });
+
+    const formData = new URLSearchParams();
+    formData.append("nama", playerName);
+    formData.append("kelas", playerAbsence);
+    formData.append("skor", score);
+    formData.append("detailJawaban", JSON.stringify(detailJawaban));
+
+    fetch(googleScriptUrl, {
+      method: "POST",
+      mode: "no-cors",
+      body: formData,
+    }).catch(err => console.error("Sync error:", err));
+  },
+
+  /**
+   * Save current answer
+   */
+  saveAnswer: function () {
+    const level = levels[this.level];
+    this.answers[level.name] = $("#code").val();
+  },
+
+  /**
+   * Show try again animation
+   */
+  tryagain: function () {
+    $("#editor").addClass("animated shake");
+  },
+
+  /**
+   * Analisis kode user dan tampilkan notifikasi error yang detail
+   */
+  showErrorNotification: function () {
+    if (typeof Swal === "undefined") return;
+
+    var userCode = $("#code").val().trim();
+    var level = levels[this.level];
+    var expectedStyle = level.style;
+    var errorMessages = [];
+    var hints = [];
+
+    // 1. Cek jika kode kosong
+    if (userCode === "") {
+      Swal.fire({
+        icon: "error",
+        title: "❌ Kode Kosong!",
+        html: '<p style="font-size:0.95em;">Kamu belum mengetikkan kode CSS apapun.</p><p style="font-size:0.85em;color:#94a3b8;margin-top:8px;">Baca instruksi di atas dan tulis properti CSS yang diminta.</p>',
+        confirmButtonText: "OK, Saya Coba",
+        customClass: { confirmButton: "swal2-biru-btn", popup: "swal2-enhanced-popup" },
+      });
+      return;
+    }
+
+    // 2. Parse kode user menjadi key-value pairs
+    var userProps = {};
+    var lines = userCode.split("\n");
+    for (var li = 0; li < lines.length; li++) {
+      var line = lines[li].trim();
+      if (line === "") continue;
+
+      // Cek apakah ada titik dua
+      if (line.indexOf(":") === -1) {
+        errorMessages.push('Baris <code style="color:#f97316;">' + game.escapeHtml(line) + '</code> tidak memiliki tanda titik dua (<code>:</code>).');
+        continue;
+      }
+
+      var parts = line.split(":");
+      var prop = parts[0].trim();
+      var val = parts.slice(1).join(":").trim();
+
+      // Cek apakah ada titik koma di akhir
+      if (!val.endsWith(";")) {
+        errorMessages.push('Properti <code style="color:#f97316;">' + game.escapeHtml(prop) + '</code> kurang tanda titik koma (<code>;</code>) di akhir.');
+      }
+
+      // Hapus titik koma untuk perbandingan
+      val = val.replace(/;$/, "").trim();
+      userProps[prop] = val;
+    }
+
+    // 3. Bandingkan dengan expected style
+    var expectedKeys = Object.keys(expectedStyle);
+    var validCSSProperties = ["justify-content", "align-items", "flex-direction", "flex-wrap", "flex-flow", "align-content", "align-self", "order", "flex-grow", "flex-shrink", "flex-basis"];
+
+    for (var ei = 0; ei < expectedKeys.length; ei++) {
+      var expectedProp = expectedKeys[ei];
+      var expectedVal = expectedStyle[expectedProp];
+
+      if (!(expectedProp in userProps)) {
+        // Properti yang dibutuhkan tidak ada
+        errorMessages.push('Properti <code style="color:#60a5fa;">' + expectedProp + '</code> belum ditulis. Kamu perlu menambahkan properti ini.');
+        hints.push('<code>' + expectedProp + ': ...;</code>');
+      } else if (userProps[expectedProp] !== expectedVal) {
+        // Nilainya salah - cek apakah mungkin typo
+        var userVal = userProps[expectedProp];
+        var similarity = game.stringSimilarity(userVal, expectedVal);
+
+        if (similarity > 0.5 && similarity < 1) {
+          errorMessages.push('Properti <code style="color:#60a5fa;">' + expectedProp + '</code>: nilai <code style="color:#ef4444;">' + game.escapeHtml(userVal) + '</code> sepertinya <strong>typo</strong>. Periksa kembali ejaannya!');
+        } else {
+          errorMessages.push('Properti <code style="color:#60a5fa;">' + expectedProp + '</code>: nilai <code style="color:#ef4444;">' + game.escapeHtml(userVal) + '</code> <strong>tidak tepat</strong>. Coba nilai yang lain.');
+        }
+      }
+    }
+
+    // 4. Cek properti yang tidak diperlukan
+    var userKeys = Object.keys(userProps);
+    for (var ui = 0; ui < userKeys.length; ui++) {
+      var userProp = userKeys[ui];
+      if (!(userProp in expectedStyle)) {
+        // Cek apakah properti valid tapi tidak diperlukan
+        var isValidCSS = validCSSProperties.indexOf(userProp) !== -1;
+        if (isValidCSS) {
+          errorMessages.push('Properti <code style="color:#fbbf24;">' + game.escapeHtml(userProp) + '</code> tidak diperlukan untuk soal ini.');
+        } else {
+          // Kemungkinan typo pada nama properti
+          var bestMatch = "";
+          var bestScore = 0;
+          for (var vi = 0; vi < validCSSProperties.length; vi++) {
+            var score = game.stringSimilarity(userProp, validCSSProperties[vi]);
+            if (score > bestScore) {
+              bestScore = score;
+              bestMatch = validCSSProperties[vi];
+            }
+          }
+          if (bestScore > 0.5) {
+            errorMessages.push('Properti <code style="color:#ef4444;">' + game.escapeHtml(userProp) + '</code> sepertinya <strong>typo</strong>. Mungkin maksudnya <code style="color:#10b981;">' + bestMatch + '</code>?');
+          } else {
+            errorMessages.push('Properti <code style="color:#ef4444;">' + game.escapeHtml(userProp) + '</code> tidak dikenali sebagai properti CSS yang valid.');
+          }
+        }
+      }
+    }
+
+    // 5. Tampilkan popup error
+    if (errorMessages.length === 0) {
+      errorMessages.push("Kode CSS kamu belum menghasilkan posisi yang tepat. Coba periksa kembali nilai propertinya.");
+    }
+
+    var errorHtml = '<div style="text-align:left;max-height:300px;overflow-y:auto;">';
+    errorHtml += '<div style="font-size:0.9em;color:#cbd5e1;margin-bottom:12px;">Ditemukan <strong style="color:#f87171;">' + errorMessages.length + ' masalah</strong> pada kode kamu:</div>';
+    errorHtml += '<ul style="list-style:none;padding:0;margin:0;">';
+    for (var mi = 0; mi < errorMessages.length; mi++) {
+      errorHtml += '<li style="background:rgba(239,68,68,0.08);border-left:3px solid #ef4444;padding:8px 12px;margin-bottom:6px;border-radius:0 8px 8px 0;font-size:0.88em;line-height:1.5;">' + errorMessages[mi] + '</li>';
+    }
+    errorHtml += '</ul>';
+    if (hints.length > 0) {
+      errorHtml += '<div style="margin-top:12px;padding:10px;background:rgba(96,165,250,0.1);border-radius:8px;border:1px solid rgba(96,165,250,0.2);">';
+      errorHtml += '<div style="font-size:0.85em;color:#60a5fa;font-weight:bold;margin-bottom:4px;">💡 Hint:</div>';
+      errorHtml += '<div style="font-size:0.85em;color:#94a3b8;">Coba tambahkan: ' + hints.join(", ") + '</div>';
+      errorHtml += '</div>';
+    }
+    errorHtml += '</div>';
+
+    Swal.fire({
+      icon: "error",
+      title: "❌ Jawaban Salah!",
+      html: errorHtml,
+      confirmButtonText: "OK, Saya Perbaiki",
+      customClass: { confirmButton: "swal2-biru-btn", popup: "swal2-enhanced-popup" },
+      width: 500,
+    });
+  },
+
+  /**
+   * Hitung kemiripan dua string (0-1) untuk deteksi typo
+   */
+  stringSimilarity: function (s1, s2) {
+    if (s1 === s2) return 1;
+    if (!s1 || !s2) return 0;
+    s1 = s1.toLowerCase();
+    s2 = s2.toLowerCase();
+    var longer = s1.length > s2.length ? s1 : s2;
+    var shorter = s1.length > s2.length ? s2 : s1;
+    if (longer.length === 0) return 1;
+    var editDist = game.editDistance(longer, shorter);
+    return (longer.length - editDist) / longer.length;
+  },
+
+  /**
+   * Levenshtein edit distance
+   */
+  editDistance: function (s1, s2) {
+    var costs = [];
+    for (var i = 0; i <= s1.length; i++) {
+      var lastVal = i;
+      for (var j = 0; j <= s2.length; j++) {
+        if (i === 0) {
+          costs[j] = j;
+        } else if (j > 0) {
+          var newVal = costs[j - 1];
+          if (s1.charAt(i - 1) !== s2.charAt(j - 1)) {
+            newVal = Math.min(Math.min(newVal, lastVal), costs[j]) + 1;
+          }
+          costs[j - 1] = lastVal;
+          lastVal = newVal;
+        }
+      }
+      if (i > 0) costs[s2.length] = lastVal;
+    }
+    return costs[s2.length];
+  },
+
+  /**
+   * Escape HTML untuk mencegah XSS
+   */
+  escapeHtml: function (str) {
+    var div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  },
+
+  // ===========================================
+  // UTILITY METHODS
+  // ===========================================
+
+  /**
+   * Load CSS documentation tooltips
+   */
+  loadDocs: function () {
+    $("#instructions code").each(function () {
+      const code = $(this);
+      const text = code.text();
+
+      if (text in docs) {
+        code.addClass("help");
+
+        code.on("click", function (e) {
+          e.stopPropagation();
+
+          if ($(".tooltip").length !== 0 && clickedCode === code) {
+            $(".tooltip").remove();
+            return;
+          }
+
+          $("#levelsWrapper").hide();
+          $(".tooltip").remove();
+
+          const html = docs[text][game.language] || docs[text].en;
+
+          // Ambil posisi elemen <code> di layar
+          const offset = code.offset();
+          const tooltipX = offset.left;
+          const tooltipY = offset.top + code.outerHeight() + 10;
+
+          // Append ke body supaya tidak terbatasi container
+          $('<div class="tooltip"></div>')
+            .html(html)
+            .css({
+              top: tooltipY + "px",
+              left: tooltipX + "px",
+              position: "absolute",
+            })
+            .appendTo("body");
+
+          $(".tooltip code").on("click", function (event) {
+            const pName = text;
+            let pValue = event.target.textContent.split(" ")[0];
+            pValue = game.getDefaultPropVal(pValue);
+            game.writeCSS(pName, pValue);
+            game.check();
+          });
+
+          clickedCode = code;
+        });
+      }
+    });
+  },
+
+  /**
+   * Get default property value
+   */
+  getDefaultPropVal: function (pValue) {
+    if (pValue === "<integer>") return "0";
+    if (pValue === "<flex-direction>") return "row nowrap";
+    return pValue;
+  },
+
+  /**
+   * Write CSS to editor
+   */
+  writeCSS: function (pName, pValue) {
+    const tokens = $("#code")
+      .val()
+      .trim()
+      .split(/[\n:;]+/)
+      .filter((i) => i);
+    const keywords = Object.keys(docs);
+    let content = "";
+    let filled = false;
+
+    if (keywords.includes(pValue)) return;
+
+    tokens.forEach((token, i) => {
+      const trimmedToken = token.trim();
+      if (!keywords.includes(trimmedToken)) return;
+
+      const append = content !== "" ? "\n" : "";
+      if (trimmedToken === pName && !filled) {
+        filled = true;
+        content += append + trimmedToken + ": " + pValue + ";";
+      } else if (i + 1 < tokens.length) {
+        const val = !keywords.includes(tokens[i + 1].trim())
+          ? tokens[i + 1].trim()
+          : "";
+        content += append + trimmedToken + ": " + val + ";";
+      }
+    });
+
+    if (!filled) {
+      content += content !== "" ? "\n" : "";
+      content += pName + ": " + pValue + ";";
+    }
+
+    $("#code").val(content).focus();
+  },
+
+  /**
+   * Translate interface to selected language
+   */
+  translate: function () {
+    document.title = messages.title[this.language] || messages.title.en;
+    $("html").attr("lang", this.language);
+
+    const level = levels[this.level];
+    const instructions =
+      level.instructions[this.language] || level.instructions.en;
+    $("#instructions").html(instructions);
+
+    this.loadDocs();
+
+    $(".translate").each(function () {
+      const label = $(this).attr("id");
+      if (messages[label]) {
+        const text = messages[label][game.language] || messages[label].en;
+        $("#" + label).text(text);
+      }
+    });
+  },
+
+  /**
+   * Debounce function to limit execution frequency
+   */
+  debounce: function (func, wait, immediate) {
+    let timeout;
+    return function () {
+      const context = this;
+      const args = arguments;
+      const later = function () {
+        timeout = null;
+        if (!immediate) func.apply(context, args);
+      };
+      const callNow = immediate && !timeout;
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+      if (callNow) func.apply(context, args);
+    };
+  },
+};
+
+// ===========================================
+// INITIALIZATION
+// ===========================================
+
+function initializeGame() {
+  // Initialize AlertHelper
+  AlertHelper.init();
+
+  console.log("📦 Checking dependencies...");
+  console.log("jQuery available:", typeof jQuery !== "undefined" ? "✓" : "✗");
+  console.log("Swal available:", typeof Swal !== "undefined" ? "✓" : "✗");
+
+  // Wait for SweetAlert2 to load before starting the game
+  let checkCount = 0;
+  const maxChecks = 100; // 100 * 100ms = 10 seconds
+
+  function startGameWhenReady() {
+    if (typeof Swal !== "undefined") {
+      // SweetAlert2 is loaded
+      AlertHelper.hasSweetAlert = true;
+      console.log("✓ SweetAlert2 loaded successfully");
+      game.start();
+    } else if (checkCount < maxChecks) {
+      checkCount++;
+      // Wait 100ms and try again
+      setTimeout(startGameWhenReady, 100);
+    } else {
+      // Timeout - SweetAlert2 might not be available
+      console.warn(
+        "⚠ SweetAlert2 did not load within 10 seconds, using fallback",
+      );
+      AlertHelper.hasSweetAlert = false;
+      game.start();
+    }
+  }
+
+  startGameWhenReady();
+}
+
+// Check if jQuery is ready
+if (typeof jQuery !== "undefined") {
+  $(document).ready(initializeGame);
+} else {
+  // Fallback if jQuery doesn't load
+  console.error("⚠ jQuery not found, waiting...");
+  window.addEventListener("load", initializeGame);
+}
