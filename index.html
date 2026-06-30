@@ -1,889 +1,1909 @@
-<!DOCTYPE html>
+<!doctype html>
 <html class="dark" lang="id">
-<head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>MagicFlex - Belajar CSS Flexbox dengan Game Interaktif</title>
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&amp;family=Space+Grotesk:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
-  <script src="js/tailwind-config.js"></script>
-  <link rel="stylesheet" href="css/custom.css" />
-</head>
-<body class="bg-background text-on-background font-body-md min-h-screen">
-
-<!-- TopNavBar Component -->
-<header class="docked z-50 sticky top-0">
-  <div class="flex justify-between items-center px-margin-desktop py-4 w-full mx-auto absolute bg-surface-container top-0 border-b border-secondary-fixed-variant/30 shadow-[0px_4px_20px_rgba(125,78,250,0.1)] shadow-md">
-    <div class="flex items-center gap-4">
-      <span class="font-headline-lg text-headline-lg text-secondary-fixed-dim tracking-tight">MagicFlex</span>
-    </div>
-    <nav class="hidden md:flex items-center gap-gutter relative" id="main-nav">
-      <a class="nav-link font-body-md text-body-md text-on-surface-variant hover:text-secondary pb-1 px-2 hover:bg-surface-bright/20 transition-all duration-300 active:scale-95 transition-transform relative z-10" href="#home">Beranda</a>
-      <!-- <a class="nav-link font-body-md text-body-md text-on-surface-variant hover:text-secondary pb-1 px-2 hover:bg-surface-bright/20 transition-all duration-300 active:scale-95 transition-transform relative z-10" href="#tutorial">Tutorial</a> -->
-      <a class="nav-link font-body-md text-body-md text-on-surface-variant hover:text-secondary pb-1 px-2 hover:bg-surface-bright/20 transition-all duration-300 active:scale-95 transition-transform relative z-10" href="#materi">Materi</a>
-      <a class="nav-link font-body-md text-body-md text-on-surface-variant hover:text-secondary pb-1 px-2 hover:bg-surface-bright/20 transition-all duration-300 active:scale-95 transition-transform relative z-10" href="#tentangkami">Tentang Kami</a>
-      <!-- Sliding Underline Indicator -->
-      <div id="nav-indicator" class="absolute bottom-0 h-0.5 bg-secondary-fixed transition-all duration-300 ease-out z-0 pointer-events-none"></div>
-    </nav>
-    <div class="flex items-center gap-4 text-secondary dark:text-secondary">
-      <span class="material-symbols-outlined cursor-pointer hover:bg-surface-bright/20 transition-all duration-300 active:scale-95 transition-transform p-2 rounded-full" data-modal="handout">auto_stories</span>
-    </div>
-  </div>
-</header>
-
-<main>
-  <!-- Hero Section -->
-  <section id="home" class="relative w-full h-[800px] flex items-center justify-center overflow-hidden border-b border-outline-variant/30">
-    <div class="absolute inset-0 z-0">
-      <img alt="MagicFlex Cosmic Space Background" class="w-full h-full object-cover" src="images/bg.png"/>
-    </div>
-    
-    <!-- Floating Ornaments (elements 1-5) -->
-    <div class="absolute inset-0 pointer-events-none overflow-hidden z-10">
-      <div class="element-ornament absolute w-20 h-20 animate-float-slow" style="top: 20%; left: 8%; background-image: url('images/element 1.svg'); background-size: contain; background-repeat: no-repeat;"></div>
-      <div class="element-ornament absolute w-28 h-28 animate-float" style="top: 12%; right: 10%; background-image: url('images/element 2.svg'); background-size: contain; background-repeat: no-repeat;"></div>
-      <div class="element-ornament absolute w-24 h-24 animate-float-fast" style="top: 55%; left: 12%; background-image: url('images/element 3.svg'); background-size: contain; background-repeat: no-repeat;"></div>
-      <div class="element-ornament absolute w-20 h-20 animate-float-slow" style="top: 65%; right: 15%; background-image: url('images/element 4.svg'); background-size: contain; background-repeat: no-repeat;"></div>
-      <div class="element-ornament absolute w-24 h-24 animate-float" style="top: 35%; right: 28%; background-image: url('images/element 5.svg'); background-size: contain; background-repeat: no-repeat;"></div>
-    </div>
-
-    <div class="relative z-20 text-center px-margin-desktop flex flex-col items-center gap-6 max-w-3xl scroll-hidden-scale">
-      <h1 class="font-headline-xl text-headline-xl text-secondary-fixed-dim tracking-tight mb-4 drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]">MagicFlex</h1>
-      <p class="font-body-lg text-body-lg text-on-surface max-w-2xl bg-surface-container-high/80 p-6 rounded-lg border border-outline-variant/50 backdrop-blur-md shadow-2xl leading-relaxed">
-        Ikuti petualangan sihir yang menakjubkan untuk menguasai Flexbox, dari tingkat dasar hingga mahir.
-      </p>
-      <a href="game.html" class="mt-8 bg-primary-container text-on-primary-container font-body-lg text-body-lg px-8 py-4 rounded-lg shadow-lg hover:bg-primary hover:text-on-primary hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 border border-primary/30 mystical-glow">
-        <span class="material-symbols-outlined">auto_stories</span>
-        Mulai Petualangan
-      </a>
-    </div>
-  </section>
-
-  <!-- Video Tutorial Section -->
-  <!-- <section id="tutorial" class="py-24 px-margin-desktop max-w-[1280px] mx-auto flex flex-col items-center bg-surface-container-lowest">
-    <div class="text-center mb-12 scroll-hidden">
-      <h2 class="font-headline-lg text-headline-lg text-secondary mb-4 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">Tutorial Penggunaan MagicFlex</h2>
-      <p class="font-body-lg text-body-lg text-on-surface-variant">Pelajari dasar-dasar Flexbox dengan video panduan interaktif kami.</p>
-    </div>
-    <div class="w-full max-w-4xl bg-surface-container-highest rounded-xl p-3 shadow-2xl border border-outline-variant/30 scroll-hidden scroll-stagger-1">
-      <div class="w-full aspect-video bg-surface relative rounded-lg border border-outline-variant/50 flex items-center justify-center overflow-hidden">
-        <iframe
-          class="w-full h-full rounded-lg"
-          src="https://www.youtube.com/embed/j5NvpxsE__U"
-          title="Tutorial MagicFlex: Belajar CSS Flexbox Lewat Game Interaktif"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen>
-        </iframe>
-      </div>
-    </div>
-  </section> -->
-
-  <!-- Materi Section -->
-  <section class="py-24 px-margin-desktop max-w-[1280px] mx-auto bg-surface-container" id="materi">
-    <div class="text-center mb-16 scroll-hidden">
-      <h2 class="font-headline-lg text-headline-lg text-primary mb-4 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">Materi Pembelajaran</h2>
-      <p class="font-body-lg text-body-lg text-on-surface-variant">Kuasai konsep-konsep Flexbox melalui penjelasan praktis dan interaktif</p>
-    </div>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-      <!-- Card 1: justify-content -->
-      <div class="bg-surface-container-high rounded-r-lg p-8 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group border border-outline-variant/30 book-binding relative overflow-hidden cursor-pointer grid grid-cols-1 scroll-hidden scroll-stagger-1" style="border-left-color: var(--tw-colors-secondary-container)" data-modal="justify-content">
-        <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-700"></div>
-        <div class="w-14 h-14 bg-primary-container/50 rounded-full flex items-center justify-center mb-6 text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors border border-primary/20 backdrop-blur-sm relative z-10">
-          <span class="material-symbols-outlined text-2xl">format_align_justify</span>
-        </div>
-        <h3 class="font-headline-lg text-[22px] text-inverse-surface mb-3 relative z-10">justify-content</h3>
-        <p class="font-body-md text-body-md text-on-surface-variant mb-8 relative z-10 leading-relaxed">Mengatur perataan item secara horizontal di sepanjang main axis container.</p>
-        <button class="w-full bg-transparent text-primary border border-primary/50 rounded py-3 font-label-sm text-label-sm uppercase hover:bg-primary hover:text-on-primary transition-colors relative z-10" data-modal="justify-content">Mulai Belajar</button>
-      </div>
-
-      <!-- Card 2: align-items -->
-      <div class="bg-surface-container-high rounded-r-lg p-8 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group border border-outline-variant/30 book-binding relative overflow-hidden cursor-pointer grid grid-cols-1 scroll-hidden scroll-stagger-2" style="border-left-color: var(--tw-colors-secondary-container)" data-modal="align-items">
-        <div class="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-700"></div>
-        <div class="w-14 h-14 bg-secondary-container/50 rounded-full flex items-center justify-center mb-6 text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-colors border border-secondary/20 backdrop-blur-sm relative z-10">
-          <span class="material-symbols-outlined text-2xl">align_items_stretch</span>
-        </div>
-        <h3 class="font-headline-lg text-[22px] text-inverse-surface mb-3 relative z-10">align-items</h3>
-        <p class="font-body-md text-body-md text-on-surface-variant mb-8 relative z-10 leading-relaxed">Menentukan perataan item secara vertikal pada cross axis container.</p>
-        <button class="w-full bg-transparent text-secondary border border-secondary/50 rounded py-3 font-label-sm text-label-sm uppercase hover:bg-secondary hover:text-on-secondary transition-colors relative z-10" data-modal="align-items">Mulai Belajar</button>
-      </div>
-
-      <!-- Card 3: flex-direction -->
-      <div class="bg-surface-container-high rounded-r-lg p-8 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group border border-outline-variant/30 book-binding relative overflow-hidden cursor-pointer grid grid-cols-1 scroll-hidden scroll-stagger-3" style="border-left-color: var(--tw-colors-tertiary-container)" data-modal="flex-direction">
-        <div class="absolute top-0 right-0 w-32 h-32 bg-tertiary/10 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-700"></div>
-        <div class="w-14 h-14 bg-tertiary-container/50 rounded-full flex items-center justify-center mb-6 text-tertiary group-hover:bg-tertiary group-hover:text-on-tertiary transition-colors border border-tertiary/20 backdrop-blur-sm relative z-10">
-          <span class="material-symbols-outlined text-2xl">swap_calls</span>
-        </div>
-        <h3 class="font-headline-lg text-[22px] text-inverse-surface mb-3 relative z-10">flex-direction</h3>
-        <p class="font-body-md text-body-md text-on-surface-variant mb-8 relative z-10 leading-relaxed">Menetapkan arah barisan item (row, column, dan reverse-nya).</p>
-        <button class="w-full bg-transparent text-tertiary border border-tertiary/50 rounded py-3 font-label-sm text-label-sm uppercase hover:bg-tertiary hover:text-on-tertiary transition-colors relative z-10" data-modal="flex-direction">Mulai Belajar</button>
-      </div>
-
-      <!-- Card 4: order -->
-      <div class="bg-surface-container-high rounded-r-lg p-8 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group border border-outline-variant/30 book-binding relative overflow-hidden cursor-pointer grid grid-cols-1 scroll-hidden scroll-stagger-4" style="border-left-color: var(--tw-colors-secondary-container)" data-modal="order">
-        <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-700"></div>
-        <div class="w-14 h-14 bg-primary-container/50 rounded-full flex items-center justify-center mb-6 text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors border border-primary/20 backdrop-blur-sm relative z-10">
-          <span class="material-symbols-outlined text-2xl">format_list_numbered</span>
-        </div>
-        <h3 class="font-headline-lg text-[22px] text-inverse-surface mb-3 relative z-10">order</h3>
-        <p class="font-body-md text-body-md text-on-surface-variant mb-8 relative z-10 leading-relaxed">Mengatur urutan tampilan item secara fleksibel tanpa mengubah HTML.</p>
-        <button class="w-full bg-transparent text-primary border border-primary/50 rounded py-3 font-label-sm text-label-sm uppercase hover:bg-primary hover:text-on-primary transition-colors relative z-10" data-modal="order">Mulai Belajar</button>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-8">
-      <!-- Card 5: align-self -->
-      <div class="bg-surface-container-high rounded-r-lg p-8 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group border border-outline-variant/30 book-binding relative overflow-hidden cursor-pointer grid grid-cols-1 scroll-hidden scroll-stagger-1" style="border-left-color: var(--tw-colors-secondary-container)" data-modal="align-self">
-        <div class="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-700"></div>
-        <div class="w-14 h-14 bg-secondary-container/50 rounded-full flex items-center justify-center mb-6 text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-colors border border-secondary/20 backdrop-blur-sm relative z-10">
-          <span class="material-symbols-outlined text-2xl">person_pin</span>
-        </div>
-        <h3 class="font-headline-lg text-[22px] text-inverse-surface mb-3 relative z-10">align-self</h3>
-        <p class="font-body-md text-body-md text-on-surface-variant mb-8 relative z-10 leading-relaxed">Mengatur perataan vertikal satu item secara spesifik, menimpa container.</p>
-        <button class="w-full bg-transparent text-secondary border border-secondary/50 rounded py-3 font-label-sm text-label-sm uppercase hover:bg-secondary hover:text-on-secondary transition-colors relative z-10" data-modal="align-self">Mulai Belajar</button>
-      </div>
-
-      <!-- Card 6: flex-wrap -->
-      <div class="bg-surface-container-high rounded-r-lg p-8 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group border border-outline-variant/30 book-binding relative overflow-hidden cursor-pointer grid grid-cols-1 scroll-hidden scroll-stagger-2" style="border-left-color: var(--tw-colors-tertiary-container)" data-modal="flex-wrap">
-        <div class="absolute top-0 right-0 w-32 h-32 bg-tertiary/10 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-700"></div>
-        <div class="w-14 h-14 bg-tertiary-container/50 rounded-full flex items-center justify-center mb-6 text-tertiary group-hover:bg-tertiary group-hover:text-on-tertiary transition-colors border border-tertiary/20 backdrop-blur-sm relative z-10">
-          <span class="material-symbols-outlined text-2xl">wrap_text</span>
-        </div>
-        <h3 class="font-headline-lg text-[22px] text-inverse-surface mb-3 relative z-10">flex-wrap</h3>
-        <p class="font-body-md text-body-md text-on-surface-variant mb-8 relative z-10 leading-relaxed">Menentukan apakah item akan pindah baris baru jika ruang tidak cukup.</p>
-        <button class="w-full bg-transparent text-tertiary border border-tertiary/50 rounded py-3 font-label-sm text-label-sm uppercase hover:bg-tertiary hover:text-on-tertiary transition-colors relative z-10" data-modal="flex-wrap">Mulai Belajar</button>
-      </div>
-
-      <!-- Card 7: flex-flow -->
-      <div class="bg-surface-container-high rounded-r-lg p-8 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group border border-outline-variant/30 book-binding relative overflow-hidden cursor-pointer grid grid-cols-1 scroll-hidden scroll-stagger-3" style="border-left-color: var(--tw-colors-secondary-container)" data-modal="flex-flow">
-        <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-700"></div>
-        <div class="w-14 h-14 bg-primary-container/50 rounded-full flex items-center justify-center mb-6 text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors border border-primary/20 backdrop-blur-sm relative z-10">
-          <span class="material-symbols-outlined text-2xl">sync_alt</span>
-        </div>
-        <h3 class="font-headline-lg text-[22px] text-inverse-surface mb-3 relative z-10">flex-flow</h3>
-        <p class="font-body-md text-body-md text-on-surface-variant mb-8 relative z-10 leading-relaxed">Shorthand praktis untuk menggabungkan flex-direction dan flex-wrap.</p>
-        <button class="w-full bg-transparent text-primary border border-primary/50 rounded py-3 font-label-sm text-label-sm uppercase hover:bg-primary hover:text-on-primary transition-colors relative z-10" data-modal="flex-flow">Mulai Belajar</button>
-      </div>
-
-      <!-- Card 8: align-content -->
-      <div class="bg-surface-container-high rounded-r-lg p-8 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group border border-outline-variant/30 book-binding relative overflow-hidden cursor-pointer grid grid-cols-1 scroll-hidden scroll-stagger-4" style="border-left-color: var(--tw-colors-secondary-container)" data-modal="align-content">
-        <div class="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-700"></div>
-        <div class="w-14 h-14 bg-secondary-container/50 rounded-full flex items-center justify-center mb-6 text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-colors border border-secondary/20 backdrop-blur-sm relative z-10">
-          <span class="material-symbols-outlined text-2xl">align_justify_space_between</span>
-        </div>
-        <h3 class="font-headline-lg text-[22px] text-inverse-surface mb-3 relative z-10">align-content</h3>
-        <p class="font-body-md text-body-md text-on-surface-variant mb-8 relative z-10 leading-relaxed">Mengatur posisi beberapa baris item pada cross axis saat multi-baris.</p>
-        <button class="w-full bg-transparent text-secondary border border-secondary/50 rounded py-3 font-label-sm text-label-sm uppercase hover:bg-secondary hover:text-on-secondary transition-colors relative z-10" data-modal="align-content">Mulai Belajar</button>
-      </div>
-    </div>
-
-    <div class="mt-16 flex justify-center scroll-hidden scroll-stagger-1">
-      <button data-modal="handout" class="bg-surface-bright text-on-surface font-body-lg text-body-lg px-8 py-4 rounded-full border border-outline-variant/50 shadow-md hover:bg-surface-container-highest hover:text-primary transition-all duration-300 flex items-center gap-3">
-        <span class="material-symbols-outlined">library_books</span>
-        Lihat Semua Bahan Ajar
-      </button>
-    </div>
-  </section>
-
-  <!-- Tentang Kami Section -->
-  <section class="py-24 px-margin-desktop max-w-[1280px] mx-auto bg-surface-container-low" id="tentangkami">
-    <div class="text-center mb-20 scroll-hidden">
-      <h2 class="font-headline-lg text-headline-lg text-secondary mb-6 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">Tentang Kami</h2>
-      <p class="font-body-lg text-body-lg text-on-surface max-w-3xl mx-auto leading-relaxed">
-        Website <span class="font-bold text-primary">MagicFlex</span> dibuat sebagai media pembelajaran interaktif untuk memahami <span class="italic text-tertiary">Flexbox CSS</span> dengan tema petualangan kosmik.
-      </p>
-    </div>
-    
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
-      <!-- Profile 1 -->
-      <div class="flex flex-col items-center text-center group scroll-hidden scroll-stagger-3">
-        <div class="w-40 h-48 mb-6 overflow-hidden relative rounded-lg transform transition-transform group-hover:scale-105 duration-500 border-2 border-secondary-fixed">
-          <img alt="Ima Umiatul Chusnah" class="w-full h-full object-cover" src="images/cahya.jpg"/>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-        </div>
-        <h4 class="font-headline-lg text-[20px] text-inverse-surface">Ima Umiatul Chusnah </h4>
-        <!-- <span class="font-label-sm text-label-sm text-primary uppercase mt-2 tracking-wider">Peramu Visual</span> -->
-      </div>
-      
-      <!-- Profile 2 -->
-      <div class="flex flex-col items-center text-center group scroll-hidden scroll-stagger-3">
-        <div class="w-40 h-48 mb-6 overflow-hidden relative rounded-lg transform transition-transform group-hover:scale-105 duration-500 border-2 border-secondary-fixed">
-          <img alt="Hanydhar Rose Manicha" class="w-full h-full object-cover" src="images/cahya.jpg"/>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-        </div>
-        <h4 class="font-headline-lg text-[20px] text-inverse-surface">Hanydhar Rose Manicha</h4>
-        <!-- <span class="font-label-sm text-label-sm text-primary uppercase mt-2 tracking-wider">Peramu Visual</span> -->
-      </div>
-      
-      <!-- Profile 3 -->
-      <div class="flex flex-col items-center text-center group scroll-hidden scroll-stagger-3">
-        <div class="w-40 h-48 mb-6 overflow-hidden relative rounded-lg transform transition-transform group-hover:scale-105 duration-500 border-2 border-secondary-fixed">
-          <img alt="Maridho Anike Putri" class="w-full h-full object-cover" src="images/cahya.jpg"/>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-        </div>
-        <h4 class="font-headline-lg text-[20px] text-inverse-surface">Maridho Anike Putri	</h4>
-        <!-- <span class="font-label-sm text-label-sm text-primary uppercase mt-2 tracking-wider">Peramu Visual</span> -->
-      </div>
-
-      <!-- Profile 4 -->
-      <div class="flex flex-col items-center text-center group scroll-hidden scroll-stagger-1">
-        <div class="w-40 h-48 mb-6 overflow-hidden relative rounded-lg transform transition-transform group-hover:scale-105 duration-500 border-2 border-secondary-fixed">
-          <img alt="Nur Kholis Wakhid" class="w-full h-full object-cover" src="images/kholis.jpg"/>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-        </div>
-        <h4 class="font-headline-lg text-[20px] text-inverse-surface">Candra Febriyanto</h4>
-        <!-- <span class="font-label-sm text-label-sm text-primary uppercase mt-2 tracking-wider">Penyihir Kode</span> -->
-      </div>
-    </div>
-  </section>
-</main>
-
-<!-- Footer Component -->
-<footer class="bg-surface-dim dark:bg-surface-dim w-full mt-auto border-t border-outline-variant/20 bg-surface-container-low shadow-[0px_-10px_30px_rgba(0,0,0,0.5)] z-50 relative">
-  <div class="flex flex-col md:flex-row justify-between items-center gap-gutter px-margin-desktop py-12 w-full max-w-container-max mx-auto">
-    <div class="flex items-center gap-4">
-      <span class="font-headline-lg text-headline-lg text-tertiary">MagicFlex</span>
-    </div>
-    <p class="font-label-sm text-label-sm text-tertiary-fixed-dim text-center">© 2026 MagicFlex. Semua hak dilindungi.</p>
-    <nav class="flex items-center gap-6">
-      <a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-tertiary-fixed transition-colors opacity-80 hover:opacity-100 transition-opacity" href="#">Privacy Scroll</a>
-      <a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-tertiary-fixed transition-colors opacity-80 hover:opacity-100 transition-opacity" href="#">Terms of Magic</a>
-      <a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-tertiary-fixed transition-colors opacity-80 hover:opacity-100 transition-opacity" href="#">Support Orb</a>
-    </nav>
-  </div>
-</footer>
-
-<!-- Modals -->
-<div id="modal-justify-content" class="modal">
-  <div class="modal-content relative bg-surface-container border border-outline-variant/30 rounded-xl p-8 max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-on-surface">
-    <span class="close absolute top-4 right-4 text-on-surface-variant hover:text-secondary cursor-pointer text-3xl font-bold bg-surface-bright/20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:rotate-90">&times;</span>
-    <h2 class="font-headline-lg text-headline-lg text-secondary-fixed-dim mb-4 border-b border-outline-variant/30 pb-2">justify-content</h2>
-    
-    <div class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20">
-      <h3 class="font-bold text-primary mb-2 text-sm uppercase tracking-wider">Konsep Dasar</h3>
-      <p class="text-on-surface-variant leading-relaxed text-sm">
-        Properti justify-content adalah kunci untuk mengontrol tata letak horizontal dalam flexbox. Properti ini memberikan kendali penuh atas cara elemen-elemen didistribusikan di sepanjang main axis container flex.
-      </p>
-    </div>
-
-    <div class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20">
-      <h3 class="font-bold text-secondary mb-2 text-sm uppercase tracking-wider">Nilai-Nilai Properti</h3>
-      <ul class="list-disc list-inside space-y-2 text-sm text-on-surface-variant">
-        <li><strong class="text-secondary-fixed-dim">flex-start</strong>: Mengumpulkan elemen di awal container, seperti barisan yang dimulai dari garis start.</li>
-        <li><strong class="text-secondary-fixed-dim">center</strong>: Menempatkan elemen di tengah container, menciptakan keseimbangan visual yang sempurna.</li>
-        <li><strong class="text-secondary-fixed-dim">flex-end</strong>: Mengumpulkan elemen di akhir container, memberikan tampilan yang unik.</li>
-        <li><strong class="text-secondary-fixed-dim">space-between</strong>: Mendistribusikan elemen dengan jarak yang sama di antaranya, optimal untuk layout yang rapi.</li>
-        <li><strong class="text-secondary-fixed-dim">space-around</strong>: Memberikan ruang di sekitar setiap elemen, menciptakan tampilan yang lebih bernapas.</li>
-      </ul>
-    </div>
-
-    <div class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20">
-      <h3 class="font-bold text-tertiary mb-2 text-sm uppercase tracking-wider">Tantangan Pengetahuan</h3>
-      <p class="text-on-surface-variant leading-relaxed mb-4 text-sm">
-        Bayangkan Anda sedang membuat navigasi website dengan beberapa tombol yang perlu didistribusikan merata tanpa jarak di ujung-ujungnya. Properti justify-content manakah yang paling tepat?
-      </p>
-      <form class="quiz-form space-y-3" data-correct="b">
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="justify" value="a" class="mr-2 accent-primary" /> A. space-around - memberikan ruang di sekeliling setiap tombol
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="justify" value="b" class="mr-2 accent-primary" /> B. space-between - mendistribusikan tombol dengan jarak sama tanpa ruang di ujung
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="justify" value="c" class="mr-2 accent-primary" /> C. space-evenly - membagi ruang sama rata termasuk di ujung
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="justify" value="d" class="mr-2 accent-primary" /> D. flex-center - memusatkan semua tombol di tengah
-        </label>
-        <div class="quiz-feedback hidden p-3 rounded-lg mt-3 text-center text-sm font-semibold">
-          <p class="answer-status"></p>
-          <p class="answer-hint hidden text-green-400 mt-1">Jawaban yang benar: B. space-between</p>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<div id="modal-align-items" class="modal">
-  <div class="modal-content relative bg-surface-container border border-outline-variant/30 rounded-xl p-8 max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-on-surface">
-    <span class="close absolute top-4 right-4 text-on-surface-variant hover:text-secondary cursor-pointer text-3xl font-bold bg-surface-bright/20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:rotate-90">&times;</span>
-    <h2 class="font-headline-lg text-headline-lg text-secondary-fixed-dim mb-4 border-b border-outline-variant/30 pb-2">align-items</h2>
-    
-    <div class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20">
-      <h3 class="font-bold text-primary mb-2 text-sm uppercase tracking-wider">Penjelasan</h3>
-      <p class="text-on-surface-variant leading-relaxed text-sm">
-        Properti align-items mengatur perataan elemen secara vertikal dalam container flex.
-      </p>
-      <ul class="list-disc list-inside space-y-2 text-sm text-on-surface-variant mt-2">
-        <li><strong class="text-secondary-fixed-dim">flex-start:</strong> Elemen diratakan di atas container.</li>
-        <li><strong class="text-secondary-fixed-dim">center:</strong> Elemen diratakan di tengah vertikal.</li>
-        <li><strong class="text-secondary-fixed-dim">flex-end:</strong> Elemen diratakan di bawah container.</li>
-        <li><strong class="text-secondary-fixed-dim">stretch:</strong> Elemen diregangkan memenuhi tinggi container.</li>
-        <li><strong class="text-secondary-fixed-dim">baseline:</strong> Elemen diratakan berdasarkan baseline teks.</li>
-      </ul>
-    </div>
-
-    <div class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20">
-      <h3 class="font-bold text-tertiary mb-2 text-sm uppercase tracking-wider">Soal Latihan</h3>
-      <p class="text-on-surface-variant leading-relaxed mb-4 text-sm">
-        Nilai align-items apa yang harus digunakan agar elemen mengisi seluruh tinggi container secara otomatis?
-      </p>
-      <form class="quiz-form space-y-3" data-correct="c">
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="align" value="a" class="mr-2 accent-primary" /> A. flex-fill
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="align" value="b" class="mr-2 accent-primary" /> B. full-height
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="align" value="c" class="mr-2 accent-primary" /> C. stretch
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="align" value="d" class="mr-2 accent-primary" /> D. extend
-        </label>
-        <div class="quiz-feedback hidden p-3 rounded-lg mt-3 text-center text-sm font-semibold">
-          <p class="answer-status"></p>
-          <p class="answer-hint hidden text-green-400 mt-1">Jawaban yang benar: C. stretch</p>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<div id="modal-flex-direction" class="modal">
-  <div class="modal-content relative bg-surface-container border border-outline-variant/30 rounded-xl p-8 max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-on-surface">
-    <span class="close absolute top-4 right-4 text-on-surface-variant hover:text-secondary cursor-pointer text-3xl font-bold bg-surface-bright/20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:rotate-90">&times;</span>
-    <h2 class="font-headline-lg text-headline-lg text-secondary-fixed-dim mb-4 border-b border-outline-variant/30 pb-2">flex-direction</h2>
-    
-    <div class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20">
-      <h3 class="font-bold text-primary mb-2 text-sm uppercase tracking-wider">Penjelasan</h3>
-      <p class="text-on-surface-variant leading-relaxed text-sm">
-        Properti flex-direction menentukan arah penyusunan elemen dalam container flex.
-      </p>
-      <ul class="list-disc list-inside space-y-2 text-sm text-on-surface-variant mt-2">
-        <li><strong class="text-secondary-fixed-dim">row:</strong> Elemen disusun horizontal dari kiri ke kanan.</li>
-        <li><strong class="text-secondary-fixed-dim">row-reverse:</strong> Elemen disusun horizontal dari kanan ke kiri.</li>
-        <li><strong class="text-secondary-fixed-dim">column:</strong> Elemen disusun vertikal dari atas ke bawah.</li>
-        <li><strong class="text-secondary-fixed-dim">column-reverse:</strong> Elemen disusun vertikal dari bawah ke atas.</li>
-      </ul>
-    </div>
-
-    <div class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20">
-      <h3 class="font-bold text-tertiary mb-2 text-sm uppercase tracking-wider">Soal Latihan</h3>
-      <p class="text-on-surface-variant leading-relaxed mb-4 text-sm">
-        Untuk membuat layout vertikal dari atas ke bawah, flex-direction apa yang harus digunakan?
-      </p>
-      <form class="quiz-form space-y-3" data-correct="c">
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="direction" value="a" class="mr-2 accent-primary" /> A. vertical
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="direction" value="b" class="mr-2 accent-primary" /> B. row
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="direction" value="c" class="mr-2 accent-primary" /> C. column
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="direction" value="d" class="mr-2 accent-primary" /> D. top-bottom
-        </label>
-        <div class="quiz-feedback hidden p-3 rounded-lg mt-3 text-center text-sm font-semibold">
-          <p class="answer-status"></p>
-          <p class="answer-hint hidden text-green-400 mt-1">Jawaban yang benar: C. column</p>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<div id="modal-order" class="modal">
-  <div class="modal-content relative bg-surface-container border border-outline-variant/30 rounded-xl p-8 max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-on-surface">
-    <span class="close absolute top-4 right-4 text-on-surface-variant hover:text-secondary cursor-pointer text-3xl font-bold bg-surface-bright/20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:rotate-90">&times;</span>
-    <h2 class="font-headline-lg text-headline-lg text-secondary-fixed-dim mb-4 border-b border-outline-variant/30 pb-2">order</h2>
-    
-    <div class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20">
-      <h3 class="font-bold text-primary mb-2 text-sm uppercase tracking-wider">Penjelasan</h3>
-      <p class="text-on-surface-variant leading-relaxed text-sm">
-        Properti order mengatur urutan tampilan elemen flex tanpa mengubah HTML.
-      </p>
-      <ul class="list-disc list-inside space-y-2 text-sm text-on-surface-variant mt-2">
-        <li>Menggunakan nilai angka (positif atau negatif).</li>
-        <li>Nilai lebih kecil tampil lebih dulu.</li>
-        <li>Nilai default adalah 0.</li>
-        <li>Berguna untuk responsive layout.</li>
-      </ul>
-    </div>
-
-    <div class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20">
-      <h3 class="font-bold text-tertiary mb-2 text-sm uppercase tracking-wider">Soal Latihan</h3>
-      <p class="text-on-surface-variant leading-relaxed mb-4 text-sm">
-        Jika ada 3 elemen dengan order: 2, -1, dan 1, urutan tampilan yang benar adalah:
-      </p>
-      <form class="quiz-form space-y-3" data-correct="b">
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="order" value="a" class="mr-2 accent-primary" /> A. 2, 1, -1
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="order" value="b" class="mr-2 accent-primary" /> B. -1, 1, 2
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="order" value="c" class="mr-2 accent-primary" /> C. 1, 2, -1
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="order" value="d" class="mr-2 accent-primary" /> D. 2, -1, 1
-        </label>
-        <div class="quiz-feedback hidden p-3 rounded-lg mt-3 text-center text-sm font-semibold">
-          <p class="answer-status"></p>
-          <p class="answer-hint hidden text-green-400 mt-1">Jawaban yang benar: B. -1, 1, 2</p>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<div id="modal-align-self" class="modal">
-  <div class="modal-content relative bg-surface-container border border-outline-variant/30 rounded-xl p-8 max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-on-surface">
-    <span class="close absolute top-4 right-4 text-on-surface-variant hover:text-secondary cursor-pointer text-3xl font-bold bg-surface-bright/20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:rotate-90">&times;</span>
-    <h2 class="font-headline-lg text-headline-lg text-secondary-fixed-dim mb-4 border-b border-outline-variant/30 pb-2">align-self</h2>
-    
-    <div class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20">
-      <h3 class="font-bold text-primary mb-2 text-sm uppercase tracking-wider">Penjelasan</h3>
-      <p class="text-on-surface-variant leading-relaxed text-sm">
-        Properti align-self mengatur perataan individual elemen, menimpa align-items container.
-      </p>
-      <ul class="list-disc list-inside space-y-2 text-sm text-on-surface-variant mt-2">
-        <li><strong class="text-secondary-fixed-dim">auto:</strong> Mengikuti align-items container.</li>
-        <li><strong class="text-secondary-fixed-dim">flex-start:</strong> Elemen diratakan di atas.</li>
-        <li><strong class="text-secondary-fixed-dim">center:</strong> Elemen diratakan di tengah.</li>
-        <li><strong class="text-secondary-fixed-dim">flex-end:</strong> Elemen diratakan di bawah.</li>
-        <li><strong class="text-secondary-fixed-dim">stretch:</strong> Elemen diregangkan.</li>
-      </ul>
-    </div>
-
-    <div class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20">
-      <h3 class="font-bold text-tertiary mb-2 text-sm uppercase tracking-wider">Soal Latihan</h3>
-      <p class="text-on-surface-variant leading-relaxed mb-4 text-sm">
-        Jika ingin satu elemen berada di tengah vertikal sementara yang lain mengikuti align-items container, nilai align-self apa yang digunakan?
-      </p>
-      <form class="quiz-form space-y-3" data-correct="b">
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="align-self" value="a" class="mr-2 accent-primary" /> A. middle
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="align-self" value="b" class="mr-2 accent-primary" /> B. center
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="align-self" value="c" class="mr-2 accent-primary" /> C. vertical-center
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="align-self" value="d" class="mr-2 accent-primary" /> D. self-center
-        </label>
-        <div class="quiz-feedback hidden p-3 rounded-lg mt-3 text-center text-sm font-semibold">
-          <p class="answer-status"></p>
-          <p class="answer-hint hidden text-green-400 mt-1">Jawaban yang benar: B. center</p>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<div id="modal-flex-wrap" class="modal">
-  <div class="modal-content relative bg-surface-container border border-outline-variant/30 rounded-xl p-8 max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-on-surface">
-    <span class="close absolute top-4 right-4 text-on-surface-variant hover:text-secondary cursor-pointer text-3xl font-bold bg-surface-bright/20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:rotate-90">&times;</span>
-    <h2 class="font-headline-lg text-headline-lg text-secondary-fixed-dim mb-4 border-b border-outline-variant/30 pb-2">flex-wrap</h2>
-    
-    <div class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20">
-      <h3 class="font-bold text-primary mb-2 text-sm uppercase tracking-wider">Penjelasan</h3>
-      <p class="text-on-surface-variant leading-relaxed text-sm">
-        Properti flex-wrap menentukan apakah elemen flex akan pindah baris ketika tidak cukup ruang.
-      </p>
-      <ul class="list-disc list-inside space-y-2 text-sm text-on-surface-variant mt-2">
-        <li><strong class="text-secondary-fixed-dim">nowrap:</strong> Elemen tetap dalam satu baris (default).</li>
-        <li><strong class="text-secondary-fixed-dim">wrap:</strong> Elemen pindah ke baris baru bila perlu.</li>
-        <li><strong class="text-secondary-fixed-dim">wrap-reverse:</strong> Elemen pindah ke baris baru dengan urutan terbalik.</li>
-      </ul>
-    </div>
-
-    <div class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20">
-      <h3 class="font-bold text-tertiary mb-2 text-sm uppercase tracking-wider">Soal Latihan</h3>
-      <p class="text-on-surface-variant leading-relaxed mb-4 text-sm">
-        Nilai flex-wrap apa yang harus digunakan agar elemen otomatis pindah ke baris baru saat container terlalu sempit?
-      </p>
-      <form class="quiz-form space-y-3" data-correct="c">
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="wrap" value="a" class="mr-2 accent-primary" /> A. auto-wrap
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="wrap" value="b" class="mr-2 accent-primary" /> B. break
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="wrap" value="c" class="mr-2 accent-primary" /> C. wrap
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="wrap" value="d" class="mr-2 accent-primary" /> D. new-line
-        </label>
-        <div class="quiz-feedback hidden p-3 rounded-lg mt-3 text-center text-sm font-semibold">
-          <p class="answer-status"></p>
-          <p class="answer-hint hidden text-green-400 mt-1">Jawaban yang benar: C. wrap</p>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<div id="modal-flex-flow" class="modal">
-  <div class="modal-content relative bg-surface-container border border-outline-variant/30 rounded-xl p-8 max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-on-surface">
-    <span class="close absolute top-4 right-4 text-on-surface-variant hover:text-secondary cursor-pointer text-3xl font-bold bg-surface-bright/20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:rotate-90">&times;</span>
-    <h2 class="font-headline-lg text-headline-lg text-secondary-fixed-dim mb-4 border-b border-outline-variant/30 pb-2">flex-flow</h2>
-    
-    <div class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20">
-      <h3 class="font-bold text-primary mb-2 text-sm uppercase tracking-wider">Penjelasan</h3>
-      <p class="text-on-surface-variant leading-relaxed text-sm">
-        Properti flex-flow adalah shorthand untuk flex-direction dan flex-wrap.
-      </p>
-      <ul class="list-disc list-inside space-y-2 text-sm text-on-surface-variant mt-2">
-        <li><strong>flex-flow: [direction] [wrap]</strong></li>
-        <li>Contoh: flex-flow: row wrap</li>
-        <li>Contoh: flex-flow: column nowrap</li>
-        <li>Lebih efisien daripada menulis dua properti terpisah.</li>
-      </ul>
-    </div>
-
-    <div class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20">
-      <h3 class="font-bold text-tertiary mb-2 text-sm uppercase tracking-wider">Soal Latihan</h3>
-      <p class="text-on-surface-variant leading-relaxed mb-4 text-sm">
-        Penulisan flex-flow yang benar untuk membuat layout vertikal dengan pembungkusan adalah:
-      </p>
-      <form class="quiz-form space-y-3" data-correct="b">
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="flow" value="a" class="mr-2 accent-primary" /> A. flex-flow: vertical wrap
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="flow" value="b" class="mr-2 accent-primary" /> B. flex-flow: column wrap
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="flow" value="c" class="mr-2 accent-primary" /> C. flex-flow: down wrap
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="flow" value="d" class="mr-2 accent-primary" /> D. flex-flow: column-wrap
-        </label>
-        <div class="quiz-feedback hidden p-3 rounded-lg mt-3 text-center text-sm font-semibold">
-          <p class="answer-status"></p>
-          <p class="answer-hint hidden text-green-400 mt-1">Jawaban yang benar: B. flex-flow: column wrap</p>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<div id="modal-align-content" class="modal">
-  <div class="modal-content relative bg-surface-container border border-outline-variant/30 rounded-xl p-8 max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-on-surface">
-    <span class="close absolute top-4 right-4 text-on-surface-variant hover:text-secondary cursor-pointer text-3xl font-bold bg-surface-bright/20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:rotate-90">&times;</span>
-    <h2 class="font-headline-lg text-headline-lg text-secondary-fixed-dim mb-4 border-b border-outline-variant/30 pb-2">align-content</h2>
-    
-    <div class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20">
-      <h3 class="font-bold text-primary mb-2 text-sm uppercase tracking-wider">Penjelasan</h3>
-      <p class="text-on-surface-variant leading-relaxed text-sm">
-        Properti align-content mengatur jarak antar baris dalam container flex multi-baris.
-      </p>
-      <ul class="list-disc list-inside space-y-2 text-sm text-on-surface-variant mt-2">
-        <li><strong class="text-secondary-fixed-dim">flex-start:</strong> Baris dikumpulkan di awal container.</li>
-        <li><strong class="text-secondary-fixed-dim">center:</strong> Baris dikumpulkan di tengah container.</li>
-        <li><strong class="text-secondary-fixed-dim">flex-end:</strong> Baris dikumpulkan di akhir container.</li>
-        <li><strong class="text-secondary-fixed-dim">space-between:</strong> Baris didistribusikan merata.</li>
-        <li><strong class="text-secondary-fixed-dim">space-around:</strong> Baris dengan jarak sama di sekitarnya.</li>
-        <li><strong class="text-secondary-fixed-dim">stretch:</strong> Baris diregangkan memenuhi container.</li>
-      </ul>
-    </div>
-
-    <div class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20">
-      <h3 class="font-bold text-tertiary mb-2 text-sm uppercase tracking-wider">Soal Latihan</h3>
-      <p class="text-on-surface-variant leading-relaxed mb-4 text-sm">
-        Nilai align-content apa yang membuat jarak sama antar baris, termasuk di atas dan bawah container?
-      </p>
-      <form class="quiz-form space-y-3" data-correct="a">
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="align-content" value="a" class="mr-2 accent-primary" /> A. space-around
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="align-content" value="b" class="mr-2 accent-primary" /> B. space-between
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="align-content" value="c" class="mr-2 accent-primary" /> C. distribute
-        </label>
-        <label class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200">
-          <input type="radio" name="align-content" value="d" class="mr-2 accent-primary" /> D. even-spacing
-        </label>
-        <div class="quiz-feedback hidden p-3 rounded-lg mt-3 text-center text-sm font-semibold">
-          <p class="answer-status"></p>
-          <p class="answer-hint hidden text-green-400 mt-1">Jawaban yang benar: A. space-around</p>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<div id="modal-handout" class="modal">
-  <div class="modal-content relative bg-surface-container border border-outline-variant/30 rounded-xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-on-surface">
-    <span class="close absolute top-4 right-4 text-on-surface-variant hover:text-secondary cursor-pointer text-3xl font-bold bg-surface-bright/20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:rotate-90">&times;</span>
-    <h2 class="font-headline-lg text-headline-lg text-secondary-fixed-dim mb-4 border-b border-outline-variant/30 pb-2">📖 Bahan Ajar Flexbox</h2>
-    <p class="text-on-surface-variant leading-relaxed mb-6 text-sm">
-      Jelajahi ringkasan materi Flexbox lengkap untuk memperkuat pemahamanmu. Kamu bisa gunakan Bahan Ajar ini sebagai panduan cepat saat bermain game MagicFlex.
-    </p>
-
-    <!-- Tampilkan PDF langsung -->
-    <div class="pdf-viewer border border-outline-variant/50 rounded-lg overflow-hidden mb-6">
-      <object
-        data="images/Handout Magicflex Flexbox CSS.pdf"
-        type="application/pdf"
-        width="100%"
-        height="600px"
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>MagicFlex - Belajar CSS Flexbox dengan Game Interaktif</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&amp;family=Space+Grotesk:wght@400;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script src="js/tailwind-config.js"></script>
+    <link rel="stylesheet" href="css/custom.css" />
+  </head>
+  <body class="bg-background text-on-background font-body-md min-h-screen">
+    <!-- TopNavBar Component -->
+    <header class="docked z-50 sticky top-0">
+      <div
+        class="flex justify-between items-center px-margin-desktop py-4 w-full mx-auto absolute bg-surface-container top-0 border-b border-secondary-fixed-variant/30 shadow-[0px_4px_20px_rgba(125,78,250,0.1)] shadow-md"
       >
-        <p class="p-6 text-center text-on-surface-variant text-sm">
-          Browser Anda tidak mendukung tampilan PDF langsung.
-          <a href="images/Handout Magicflex Flexbox CSS.pdf" target="_blank" class="text-primary hover:underline font-semibold"
-            >Klik di sini untuk membuka PDF</a
+        <div class="flex items-center gap-4">
+          <span
+            class="font-headline-lg text-headline-lg text-secondary-fixed-dim tracking-tight"
+            >MagicFlex</span
           >
+        </div>
+        <nav
+          class="hidden md:flex items-center gap-gutter relative"
+          id="main-nav"
+        >
+          <a
+            class="nav-link font-body-md text-body-md text-on-surface-variant hover:text-secondary pb-1 px-2 hover:bg-surface-bright/20 transition-all duration-300 active:scale-95 transition-transform relative z-10"
+            href="#home"
+            >Beranda</a
+          >
+          <a
+            class="nav-link font-body-md text-body-md text-on-surface-variant hover:text-secondary pb-1 px-2 hover:bg-surface-bright/20 transition-all duration-300 active:scale-95 transition-transform relative z-10"
+            href="#tutorial"
+            >Tutorial</a
+          >
+          <a
+            class="nav-link font-body-md text-body-md text-on-surface-variant hover:text-secondary pb-1 px-2 hover:bg-surface-bright/20 transition-all duration-300 active:scale-95 transition-transform relative z-10"
+            href="#materi"
+            >Materi</a
+          >
+          <a
+            class="nav-link font-body-md text-body-md text-on-surface-variant hover:text-secondary pb-1 px-2 hover:bg-surface-bright/20 transition-all duration-300 active:scale-95 transition-transform relative z-10"
+            href="#tentangkami"
+            >Tentang Kami</a
+          >
+          <!-- Sliding Underline Indicator -->
+          <div
+            id="nav-indicator"
+            class="absolute bottom-0 h-0.5 bg-secondary-fixed transition-all duration-300 ease-out z-0 pointer-events-none"
+          ></div>
+        </nav>
+        <div class="flex items-center gap-4 text-secondary dark:text-secondary">
+          <span
+            class="material-symbols-outlined cursor-pointer hover:bg-surface-bright/20 transition-all duration-300 active:scale-95 transition-transform p-2 rounded-full"
+            data-modal="handout"
+            >auto_stories</span
+          >
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Hero Section -->
+      <section
+        id="home"
+        class="relative w-full h-[800px] flex items-center justify-center overflow-hidden border-b border-outline-variant/30"
+      >
+        <div class="absolute inset-0 z-0">
+          <img
+            alt="MagicFlex Cosmic Space Background"
+            class="w-full h-full object-cover"
+            src="images/bg.png"
+          />
+        </div>
+
+        <!-- Floating Ornaments (elements 1-5) -->
+        <div class="absolute inset-0 pointer-events-none overflow-hidden z-10">
+          <div
+            class="element-ornament absolute w-20 h-20 animate-float-slow"
+            style="
+              top: 20%;
+              left: 8%;
+              background-image: url(&quot;images/element 1.svg&quot;);
+              background-size: contain;
+              background-repeat: no-repeat;
+            "
+          ></div>
+          <div
+            class="element-ornament absolute w-28 h-28 animate-float"
+            style="
+              top: 12%;
+              right: 10%;
+              background-image: url(&quot;images/element 2.svg&quot;);
+              background-size: contain;
+              background-repeat: no-repeat;
+            "
+          ></div>
+          <div
+            class="element-ornament absolute w-24 h-24 animate-float-fast"
+            style="
+              top: 55%;
+              left: 12%;
+              background-image: url(&quot;images/element 3.svg&quot;);
+              background-size: contain;
+              background-repeat: no-repeat;
+            "
+          ></div>
+          <div
+            class="element-ornament absolute w-20 h-20 animate-float-slow"
+            style="
+              top: 65%;
+              right: 15%;
+              background-image: url(&quot;images/element 4.svg&quot;);
+              background-size: contain;
+              background-repeat: no-repeat;
+            "
+          ></div>
+          <div
+            class="element-ornament absolute w-24 h-24 animate-float"
+            style="
+              top: 35%;
+              right: 28%;
+              background-image: url(&quot;images/element 5.svg&quot;);
+              background-size: contain;
+              background-repeat: no-repeat;
+            "
+          ></div>
+        </div>
+
+        <div
+          class="relative z-20 text-center px-margin-desktop flex flex-col items-center gap-6 max-w-3xl scroll-hidden-scale"
+        >
+          <h1
+            class="font-headline-xl text-headline-xl text-secondary-fixed-dim tracking-tight mb-4 drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]"
+          >
+            MagicFlex
+          </h1>
+          <p
+            class="font-body-lg text-body-lg text-on-surface max-w-2xl bg-surface-container-high/80 p-6 rounded-lg border border-outline-variant/50 backdrop-blur-md shadow-2xl leading-relaxed"
+          >
+            Ikuti petualangan sihir yang menakjubkan untuk menguasai Flexbox,
+            dari tingkat dasar hingga mahir.
+          </p>
+          <a
+            href="game.html"
+            class="mt-8 bg-primary-container text-on-primary-container font-body-lg text-body-lg px-8 py-4 rounded-lg shadow-lg hover:bg-primary hover:text-on-primary hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 border border-primary/30 mystical-glow"
+          >
+            <span class="material-symbols-outlined">auto_stories</span>
+            Mulai Petualangan
+          </a>
+        </div>
+      </section>
+
+      <!-- Video Tutorial Section -->
+      <section
+        id="tutorial"
+        class="py-24 px-margin-desktop max-w-[1280px] mx-auto flex flex-col items-center bg-surface-container-lowest"
+      >
+        <div class="text-center mb-12 scroll-hidden">
+          <h2
+            class="font-headline-lg text-headline-lg text-secondary mb-4 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
+          >
+            Tutorial Penggunaan MagicFlex
+          </h2>
+          <p class="font-body-lg text-body-lg text-on-surface-variant">
+            Pelajari dasar-dasar Flexbox dengan video panduan interaktif kami.
+          </p>
+        </div>
+        <div
+          class="w-full max-w-4xl bg-surface-container-highest rounded-xl p-3 shadow-2xl border border-outline-variant/30 scroll-hidden scroll-stagger-1"
+        >
+          <div
+            class="w-full aspect-video bg-surface relative rounded-lg border border-outline-variant/50 flex items-center justify-center overflow-hidden"
+          >
+            <iframe
+              width="1080"
+              height="489"
+              src="https://www.youtube.com/embed/I4e-EAu_kIw"
+              title="Kuasai CSS Flexbox dengan Cara yang Ajaib dan Interaktif di MagicFlex! 🪄✨"
+              frameborder="0"
+              allow="
+                accelerometer;
+                autoplay;
+                clipboard-write;
+                encrypted-media;
+                gyroscope;
+                picture-in-picture;
+                web-share;
+              "
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen
+            ></iframe>
+          </div>
+        </div>
+      </section>
+
+      <!-- Materi Section -->
+      <section
+        class="py-24 px-margin-desktop max-w-[1280px] mx-auto bg-surface-container"
+        id="materi"
+      >
+        <div class="text-center mb-16 scroll-hidden">
+          <h2
+            class="font-headline-lg text-headline-lg text-primary mb-4 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
+          >
+            Materi Pembelajaran
+          </h2>
+          <p class="font-body-lg text-body-lg text-on-surface-variant">
+            Kuasai konsep-konsep Flexbox melalui penjelasan praktis dan
+            interaktif
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <!-- Card 1: justify-content -->
+          <div
+            class="bg-surface-container-high rounded-r-lg p-8 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group border border-outline-variant/30 book-binding relative overflow-hidden cursor-pointer grid grid-cols-1 scroll-hidden scroll-stagger-1"
+            style="border-left-color: var(--tw-colors-secondary-container)"
+            data-modal="justify-content"
+          >
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-700"
+            ></div>
+            <div
+              class="w-14 h-14 bg-primary-container/50 rounded-full flex items-center justify-center mb-6 text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors border border-primary/20 backdrop-blur-sm relative z-10"
+            >
+              <span class="material-symbols-outlined text-2xl"
+                >format_align_justify</span
+              >
+            </div>
+            <h3
+              class="font-headline-lg text-[22px] text-inverse-surface mb-3 relative z-10"
+            >
+              justify-content
+            </h3>
+            <p
+              class="font-body-md text-body-md text-on-surface-variant mb-8 relative z-10 leading-relaxed"
+            >
+              Mengatur perataan item secara horizontal di sepanjang main axis
+              container.
+            </p>
+            <button
+              class="w-full bg-transparent text-primary border border-primary/50 rounded py-3 font-label-sm text-label-sm uppercase hover:bg-primary hover:text-on-primary transition-colors relative z-10"
+              data-modal="justify-content"
+            >
+              Mulai Belajar
+            </button>
+          </div>
+
+          <!-- Card 2: align-items -->
+          <div
+            class="bg-surface-container-high rounded-r-lg p-8 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group border border-outline-variant/30 book-binding relative overflow-hidden cursor-pointer grid grid-cols-1 scroll-hidden scroll-stagger-2"
+            style="border-left-color: var(--tw-colors-secondary-container)"
+            data-modal="align-items"
+          >
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-700"
+            ></div>
+            <div
+              class="w-14 h-14 bg-secondary-container/50 rounded-full flex items-center justify-center mb-6 text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-colors border border-secondary/20 backdrop-blur-sm relative z-10"
+            >
+              <span class="material-symbols-outlined text-2xl"
+                >align_items_stretch</span
+              >
+            </div>
+            <h3
+              class="font-headline-lg text-[22px] text-inverse-surface mb-3 relative z-10"
+            >
+              align-items
+            </h3>
+            <p
+              class="font-body-md text-body-md text-on-surface-variant mb-8 relative z-10 leading-relaxed"
+            >
+              Menentukan perataan item secara vertikal pada cross axis
+              container.
+            </p>
+            <button
+              class="w-full bg-transparent text-secondary border border-secondary/50 rounded py-3 font-label-sm text-label-sm uppercase hover:bg-secondary hover:text-on-secondary transition-colors relative z-10"
+              data-modal="align-items"
+            >
+              Mulai Belajar
+            </button>
+          </div>
+
+          <!-- Card 3: flex-direction -->
+          <div
+            class="bg-surface-container-high rounded-r-lg p-8 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group border border-outline-variant/30 book-binding relative overflow-hidden cursor-pointer grid grid-cols-1 scroll-hidden scroll-stagger-3"
+            style="border-left-color: var(--tw-colors-tertiary-container)"
+            data-modal="flex-direction"
+          >
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-tertiary/10 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-700"
+            ></div>
+            <div
+              class="w-14 h-14 bg-tertiary-container/50 rounded-full flex items-center justify-center mb-6 text-tertiary group-hover:bg-tertiary group-hover:text-on-tertiary transition-colors border border-tertiary/20 backdrop-blur-sm relative z-10"
+            >
+              <span class="material-symbols-outlined text-2xl">swap_calls</span>
+            </div>
+            <h3
+              class="font-headline-lg text-[22px] text-inverse-surface mb-3 relative z-10"
+            >
+              flex-direction
+            </h3>
+            <p
+              class="font-body-md text-body-md text-on-surface-variant mb-8 relative z-10 leading-relaxed"
+            >
+              Menetapkan arah barisan item (row, column, dan reverse-nya).
+            </p>
+            <button
+              class="w-full bg-transparent text-tertiary border border-tertiary/50 rounded py-3 font-label-sm text-label-sm uppercase hover:bg-tertiary hover:text-on-tertiary transition-colors relative z-10"
+              data-modal="flex-direction"
+            >
+              Mulai Belajar
+            </button>
+          </div>
+
+          <!-- Card 4: order -->
+          <div
+            class="bg-surface-container-high rounded-r-lg p-8 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group border border-outline-variant/30 book-binding relative overflow-hidden cursor-pointer grid grid-cols-1 scroll-hidden scroll-stagger-4"
+            style="border-left-color: var(--tw-colors-secondary-container)"
+            data-modal="order"
+          >
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-700"
+            ></div>
+            <div
+              class="w-14 h-14 bg-primary-container/50 rounded-full flex items-center justify-center mb-6 text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors border border-primary/20 backdrop-blur-sm relative z-10"
+            >
+              <span class="material-symbols-outlined text-2xl"
+                >format_list_numbered</span
+              >
+            </div>
+            <h3
+              class="font-headline-lg text-[22px] text-inverse-surface mb-3 relative z-10"
+            >
+              order
+            </h3>
+            <p
+              class="font-body-md text-body-md text-on-surface-variant mb-8 relative z-10 leading-relaxed"
+            >
+              Mengatur urutan tampilan item secara fleksibel tanpa mengubah
+              HTML.
+            </p>
+            <button
+              class="w-full bg-transparent text-primary border border-primary/50 rounded py-3 font-label-sm text-label-sm uppercase hover:bg-primary hover:text-on-primary transition-colors relative z-10"
+              data-modal="order"
+            >
+              Mulai Belajar
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-8">
+          <!-- Card 5: align-self -->
+          <div
+            class="bg-surface-container-high rounded-r-lg p-8 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group border border-outline-variant/30 book-binding relative overflow-hidden cursor-pointer grid grid-cols-1 scroll-hidden scroll-stagger-1"
+            style="border-left-color: var(--tw-colors-secondary-container)"
+            data-modal="align-self"
+          >
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-700"
+            ></div>
+            <div
+              class="w-14 h-14 bg-secondary-container/50 rounded-full flex items-center justify-center mb-6 text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-colors border border-secondary/20 backdrop-blur-sm relative z-10"
+            >
+              <span class="material-symbols-outlined text-2xl">person_pin</span>
+            </div>
+            <h3
+              class="font-headline-lg text-[22px] text-inverse-surface mb-3 relative z-10"
+            >
+              align-self
+            </h3>
+            <p
+              class="font-body-md text-body-md text-on-surface-variant mb-8 relative z-10 leading-relaxed"
+            >
+              Mengatur perataan vertikal satu item secara spesifik, menimpa
+              container.
+            </p>
+            <button
+              class="w-full bg-transparent text-secondary border border-secondary/50 rounded py-3 font-label-sm text-label-sm uppercase hover:bg-secondary hover:text-on-secondary transition-colors relative z-10"
+              data-modal="align-self"
+            >
+              Mulai Belajar
+            </button>
+          </div>
+
+          <!-- Card 6: flex-wrap -->
+          <div
+            class="bg-surface-container-high rounded-r-lg p-8 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group border border-outline-variant/30 book-binding relative overflow-hidden cursor-pointer grid grid-cols-1 scroll-hidden scroll-stagger-2"
+            style="border-left-color: var(--tw-colors-tertiary-container)"
+            data-modal="flex-wrap"
+          >
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-tertiary/10 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-700"
+            ></div>
+            <div
+              class="w-14 h-14 bg-tertiary-container/50 rounded-full flex items-center justify-center mb-6 text-tertiary group-hover:bg-tertiary group-hover:text-on-tertiary transition-colors border border-tertiary/20 backdrop-blur-sm relative z-10"
+            >
+              <span class="material-symbols-outlined text-2xl">wrap_text</span>
+            </div>
+            <h3
+              class="font-headline-lg text-[22px] text-inverse-surface mb-3 relative z-10"
+            >
+              flex-wrap
+            </h3>
+            <p
+              class="font-body-md text-body-md text-on-surface-variant mb-8 relative z-10 leading-relaxed"
+            >
+              Menentukan apakah item akan pindah baris baru jika ruang tidak
+              cukup.
+            </p>
+            <button
+              class="w-full bg-transparent text-tertiary border border-tertiary/50 rounded py-3 font-label-sm text-label-sm uppercase hover:bg-tertiary hover:text-on-tertiary transition-colors relative z-10"
+              data-modal="flex-wrap"
+            >
+              Mulai Belajar
+            </button>
+          </div>
+
+          <!-- Card 7: flex-flow -->
+          <div
+            class="bg-surface-container-high rounded-r-lg p-8 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group border border-outline-variant/30 book-binding relative overflow-hidden cursor-pointer grid grid-cols-1 scroll-hidden scroll-stagger-3"
+            style="border-left-color: var(--tw-colors-secondary-container)"
+            data-modal="flex-flow"
+          >
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-700"
+            ></div>
+            <div
+              class="w-14 h-14 bg-primary-container/50 rounded-full flex items-center justify-center mb-6 text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors border border-primary/20 backdrop-blur-sm relative z-10"
+            >
+              <span class="material-symbols-outlined text-2xl">sync_alt</span>
+            </div>
+            <h3
+              class="font-headline-lg text-[22px] text-inverse-surface mb-3 relative z-10"
+            >
+              flex-flow
+            </h3>
+            <p
+              class="font-body-md text-body-md text-on-surface-variant mb-8 relative z-10 leading-relaxed"
+            >
+              Shorthand praktis untuk menggabungkan flex-direction dan
+              flex-wrap.
+            </p>
+            <button
+              class="w-full bg-transparent text-primary border border-primary/50 rounded py-3 font-label-sm text-label-sm uppercase hover:bg-primary hover:text-on-primary transition-colors relative z-10"
+              data-modal="flex-flow"
+            >
+              Mulai Belajar
+            </button>
+          </div>
+
+          <!-- Card 8: align-content -->
+          <div
+            class="bg-surface-container-high rounded-r-lg p-8 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group border border-outline-variant/30 book-binding relative overflow-hidden cursor-pointer grid grid-cols-1 scroll-hidden scroll-stagger-4"
+            style="border-left-color: var(--tw-colors-secondary-container)"
+            data-modal="align-content"
+          >
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-700"
+            ></div>
+            <div
+              class="w-14 h-14 bg-secondary-container/50 rounded-full flex items-center justify-center mb-6 text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-colors border border-secondary/20 backdrop-blur-sm relative z-10"
+            >
+              <span class="material-symbols-outlined text-2xl"
+                >align_justify_space_between</span
+              >
+            </div>
+            <h3
+              class="font-headline-lg text-[22px] text-inverse-surface mb-3 relative z-10"
+            >
+              align-content
+            </h3>
+            <p
+              class="font-body-md text-body-md text-on-surface-variant mb-8 relative z-10 leading-relaxed"
+            >
+              Mengatur posisi beberapa baris item pada cross axis saat
+              multi-baris.
+            </p>
+            <button
+              class="w-full bg-transparent text-secondary border border-secondary/50 rounded py-3 font-label-sm text-label-sm uppercase hover:bg-secondary hover:text-on-secondary transition-colors relative z-10"
+              data-modal="align-content"
+            >
+              Mulai Belajar
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-16 flex justify-center scroll-hidden scroll-stagger-1">
+          <button
+            data-modal="handout"
+            class="bg-surface-bright text-on-surface font-body-lg text-body-lg px-8 py-4 rounded-full border border-outline-variant/50 shadow-md hover:bg-surface-container-highest hover:text-primary transition-all duration-300 flex items-center gap-3"
+          >
+            <span class="material-symbols-outlined">library_books</span>
+            Lihat Semua Bahan Ajar
+          </button>
+        </div>
+      </section>
+
+      <!-- Tentang Kami Section -->
+      <section
+        class="py-24 px-margin-desktop max-w-[1280px] mx-auto bg-surface-container-low"
+        id="tentangkami"
+      >
+        <div class="text-center mb-20 scroll-hidden">
+          <h2
+            class="font-headline-lg text-headline-lg text-secondary mb-6 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
+          >
+            Tentang Kami
+          </h2>
+          <p
+            class="font-body-lg text-body-lg text-on-surface max-w-3xl mx-auto leading-relaxed"
+          >
+            Website <span class="font-bold text-primary">MagicFlex</span> dibuat
+            sebagai media pembelajaran interaktif untuk memahami
+            <span class="italic text-tertiary">Flexbox CSS</span> dengan tema
+            petualangan kosmik.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
+          <!-- Profile 1 -->
+          <div
+            class="flex flex-col items-center text-center group scroll-hidden scroll-stagger-3"
+          >
+            <div
+              class="w-40 h-48 mb-6 overflow-hidden relative rounded-lg transform transition-transform group-hover:scale-105 duration-500 border-2 border-secondary-fixed"
+            >
+              <img
+                alt="Ima Umiatul Chusnah"
+                class="w-full h-full object-cover"
+                src="images/cahya.jpg"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"
+              ></div>
+            </div>
+            <h4 class="font-headline-lg text-[20px] text-inverse-surface">
+              Ima Umiatul Chusnah
+            </h4>
+            <!-- <span class="font-label-sm text-label-sm text-primary uppercase mt-2 tracking-wider">Peramu Visual</span> -->
+          </div>
+
+          <!-- Profile 2 -->
+          <div
+            class="flex flex-col items-center text-center group scroll-hidden scroll-stagger-3"
+          >
+            <div
+              class="w-40 h-48 mb-6 overflow-hidden relative rounded-lg transform transition-transform group-hover:scale-105 duration-500 border-2 border-secondary-fixed"
+            >
+              <img
+                alt="Hanydhar Rose Manicha"
+                class="w-full h-full object-cover"
+                src="images/cahya.jpg"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"
+              ></div>
+            </div>
+            <h4 class="font-headline-lg text-[20px] text-inverse-surface">
+              Hanydhar Rose Manicha
+            </h4>
+            <!-- <span class="font-label-sm text-label-sm text-primary uppercase mt-2 tracking-wider">Peramu Visual</span> -->
+          </div>
+
+          <!-- Profile 3 -->
+          <div
+            class="flex flex-col items-center text-center group scroll-hidden scroll-stagger-3"
+          >
+            <div
+              class="w-40 h-48 mb-6 overflow-hidden relative rounded-lg transform transition-transform group-hover:scale-105 duration-500 border-2 border-secondary-fixed"
+            >
+              <img
+                alt="Maridho Anike Putri"
+                class="w-full h-full object-cover"
+                src="images/cahya.jpg"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"
+              ></div>
+            </div>
+            <h4 class="font-headline-lg text-[20px] text-inverse-surface">
+              Maridho Anike Putri
+            </h4>
+            <!-- <span class="font-label-sm text-label-sm text-primary uppercase mt-2 tracking-wider">Peramu Visual</span> -->
+          </div>
+
+          <!-- Profile 4 -->
+          <div
+            class="flex flex-col items-center text-center group scroll-hidden scroll-stagger-1"
+          >
+            <div
+              class="w-40 h-48 mb-6 overflow-hidden relative rounded-lg transform transition-transform group-hover:scale-105 duration-500 border-2 border-secondary-fixed"
+            >
+              <img
+                alt="Nur Kholis Wakhid"
+                class="w-full h-full object-cover"
+                src="images/kholis.jpg"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"
+              ></div>
+            </div>
+            <h4 class="font-headline-lg text-[20px] text-inverse-surface">
+              Candra Febriyanto
+            </h4>
+            <!-- <span class="font-label-sm text-label-sm text-primary uppercase mt-2 tracking-wider">Penyihir Kode</span> -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer Component -->
+    <footer
+      class="bg-surface-dim dark:bg-surface-dim w-full mt-auto border-t border-outline-variant/20 bg-surface-container-low shadow-[0px_-10px_30px_rgba(0,0,0,0.5)] z-50 relative"
+    >
+      <div
+        class="flex flex-col md:flex-row justify-between items-center gap-gutter px-margin-desktop py-12 w-full max-w-container-max mx-auto"
+      >
+        <div class="flex items-center gap-4">
+          <span class="font-headline-lg text-headline-lg text-tertiary"
+            >MagicFlex</span
+          >
+        </div>
+        <p
+          class="font-label-sm text-label-sm text-tertiary-fixed-dim text-center"
+        >
+          © 2026 MagicFlex. Semua hak dilindungi.
         </p>
-      </object>
+        <nav class="flex items-center gap-6">
+          <a
+            class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-tertiary-fixed transition-colors opacity-80 hover:opacity-100 transition-opacity"
+            href="#"
+            >Privacy Scroll</a
+          >
+          <a
+            class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-tertiary-fixed transition-colors opacity-80 hover:opacity-100 transition-opacity"
+            href="#"
+            >Terms of Magic</a
+          >
+          <a
+            class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-tertiary-fixed transition-colors opacity-80 hover:opacity-100 transition-opacity"
+            href="#"
+            >Support Orb</a
+          >
+        </nav>
+      </div>
+    </footer>
+
+    <!-- Modals -->
+    <div id="modal-justify-content" class="modal">
+      <div
+        class="modal-content relative bg-surface-container border border-outline-variant/30 rounded-xl p-8 max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-on-surface"
+      >
+        <span
+          class="close absolute top-4 right-4 text-on-surface-variant hover:text-secondary cursor-pointer text-3xl font-bold bg-surface-bright/20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:rotate-90"
+          >&times;</span
+        >
+        <h2
+          class="font-headline-lg text-headline-lg text-secondary-fixed-dim mb-4 border-b border-outline-variant/30 pb-2"
+        >
+          justify-content
+        </h2>
+
+        <div
+          class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20"
+        >
+          <h3
+            class="font-bold text-primary mb-2 text-sm uppercase tracking-wider"
+          >
+            Konsep Dasar
+          </h3>
+          <p class="text-on-surface-variant leading-relaxed text-sm">
+            Properti justify-content adalah kunci untuk mengontrol tata letak
+            horizontal dalam flexbox. Properti ini memberikan kendali penuh atas
+            cara elemen-elemen didistribusikan di sepanjang main axis container
+            flex.
+          </p>
+        </div>
+
+        <div
+          class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20"
+        >
+          <h3
+            class="font-bold text-secondary mb-2 text-sm uppercase tracking-wider"
+          >
+            Nilai-Nilai Properti
+          </h3>
+          <ul
+            class="list-disc list-inside space-y-2 text-sm text-on-surface-variant"
+          >
+            <li>
+              <strong class="text-secondary-fixed-dim">flex-start</strong>:
+              Mengumpulkan elemen di awal container, seperti barisan yang
+              dimulai dari garis start.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">center</strong>:
+              Menempatkan elemen di tengah container, menciptakan keseimbangan
+              visual yang sempurna.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">flex-end</strong>:
+              Mengumpulkan elemen di akhir container, memberikan tampilan yang
+              unik.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">space-between</strong>:
+              Mendistribusikan elemen dengan jarak yang sama di antaranya,
+              optimal untuk layout yang rapi.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">space-around</strong>:
+              Memberikan ruang di sekitar setiap elemen, menciptakan tampilan
+              yang lebih bernapas.
+            </li>
+          </ul>
+        </div>
+
+        <div
+          class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20"
+        >
+          <h3
+            class="font-bold text-tertiary mb-2 text-sm uppercase tracking-wider"
+          >
+            Tantangan Pengetahuan
+          </h3>
+          <p class="text-on-surface-variant leading-relaxed mb-4 text-sm">
+            Bayangkan Anda sedang membuat navigasi website dengan beberapa
+            tombol yang perlu didistribusikan merata tanpa jarak di
+            ujung-ujungnya. Properti justify-content manakah yang paling tepat?
+          </p>
+          <form class="quiz-form space-y-3" data-correct="b">
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="justify"
+                value="a"
+                class="mr-2 accent-primary"
+              />
+              A. space-around - memberikan ruang di sekeliling setiap tombol
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="justify"
+                value="b"
+                class="mr-2 accent-primary"
+              />
+              B. space-between - mendistribusikan tombol dengan jarak sama tanpa
+              ruang di ujung
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="justify"
+                value="c"
+                class="mr-2 accent-primary"
+              />
+              C. space-evenly - membagi ruang sama rata termasuk di ujung
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="justify"
+                value="d"
+                class="mr-2 accent-primary"
+              />
+              D. flex-center - memusatkan semua tombol di tengah
+            </label>
+            <div
+              class="quiz-feedback hidden p-3 rounded-lg mt-3 text-center text-sm font-semibold"
+            >
+              <p class="answer-status"></p>
+              <p class="answer-hint hidden text-green-400 mt-1">
+                Jawaban yang benar: B. space-between
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
 
-    <!-- Tombol unduh dan buka di tab baru -->
-    <div class="flex items-center gap-4 justify-end">
-      <a
-        href="images/Handout Magicflex Flexbox CSS.pdf"
-        download
-        class="bg-surface-bright text-on-surface font-semibold px-6 py-3 rounded-lg border border-outline-variant/50 shadow-md hover:bg-surface-container-highest transition-all duration-300"
+    <div id="modal-align-items" class="modal">
+      <div
+        class="modal-content relative bg-surface-container border border-outline-variant/30 rounded-xl p-8 max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-on-surface"
       >
-        💾 Unduh PDF
-      </a>
-      <a
-        href="images/Handout Magicflex Flexbox CSS.pdf"
-        target="_blank"
-        class="bg-primary-container text-on-primary-container font-semibold px-6 py-3 rounded-lg border border-primary/30 shadow-lg hover:bg-primary hover:text-on-primary transition-all duration-300"
-      >
-        🔍 Buka di Tab Baru
-      </a>
+        <span
+          class="close absolute top-4 right-4 text-on-surface-variant hover:text-secondary cursor-pointer text-3xl font-bold bg-surface-bright/20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:rotate-90"
+          >&times;</span
+        >
+        <h2
+          class="font-headline-lg text-headline-lg text-secondary-fixed-dim mb-4 border-b border-outline-variant/30 pb-2"
+        >
+          align-items
+        </h2>
+
+        <div
+          class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20"
+        >
+          <h3
+            class="font-bold text-primary mb-2 text-sm uppercase tracking-wider"
+          >
+            Penjelasan
+          </h3>
+          <p class="text-on-surface-variant leading-relaxed text-sm">
+            Properti align-items mengatur perataan elemen secara vertikal dalam
+            container flex.
+          </p>
+          <ul
+            class="list-disc list-inside space-y-2 text-sm text-on-surface-variant mt-2"
+          >
+            <li>
+              <strong class="text-secondary-fixed-dim">flex-start:</strong>
+              Elemen diratakan di atas container.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">center:</strong> Elemen
+              diratakan di tengah vertikal.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">flex-end:</strong> Elemen
+              diratakan di bawah container.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">stretch:</strong> Elemen
+              diregangkan memenuhi tinggi container.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">baseline:</strong> Elemen
+              diratakan berdasarkan baseline teks.
+            </li>
+          </ul>
+        </div>
+
+        <div
+          class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20"
+        >
+          <h3
+            class="font-bold text-tertiary mb-2 text-sm uppercase tracking-wider"
+          >
+            Soal Latihan
+          </h3>
+          <p class="text-on-surface-variant leading-relaxed mb-4 text-sm">
+            Nilai align-items apa yang harus digunakan agar elemen mengisi
+            seluruh tinggi container secara otomatis?
+          </p>
+          <form class="quiz-form space-y-3" data-correct="c">
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="align"
+                value="a"
+                class="mr-2 accent-primary"
+              />
+              A. flex-fill
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="align"
+                value="b"
+                class="mr-2 accent-primary"
+              />
+              B. full-height
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="align"
+                value="c"
+                class="mr-2 accent-primary"
+              />
+              C. stretch
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="align"
+                value="d"
+                class="mr-2 accent-primary"
+              />
+              D. extend
+            </label>
+            <div
+              class="quiz-feedback hidden p-3 rounded-lg mt-3 text-center text-sm font-semibold"
+            >
+              <p class="answer-status"></p>
+              <p class="answer-hint hidden text-green-400 mt-1">
+                Jawaban yang benar: C. stretch
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<script>
-  // Smooth scrolling for navigation links
-  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-    anchor.addEventListener("click", function (e) {
-      e.preventDefault();
-      const target = document.querySelector(this.getAttribute("href"));
-      if (target) {
-        target.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    });
-  });
+    <div id="modal-flex-direction" class="modal">
+      <div
+        class="modal-content relative bg-surface-container border border-outline-variant/30 rounded-xl p-8 max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-on-surface"
+      >
+        <span
+          class="close absolute top-4 right-4 text-on-surface-variant hover:text-secondary cursor-pointer text-3xl font-bold bg-surface-bright/20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:rotate-90"
+          >&times;</span
+        >
+        <h2
+          class="font-headline-lg text-headline-lg text-secondary-fixed-dim mb-4 border-b border-outline-variant/30 pb-2"
+        >
+          flex-direction
+        </h2>
 
-  // Initialize when DOM is loaded
-  document.addEventListener("DOMContentLoaded", function () {
-    // Sliding nav indicator logic
-    const nav = document.getElementById("main-nav");
-    const indicator = document.getElementById("nav-indicator");
-    const navLinks = document.querySelectorAll(".nav-link");
-    const sections = [
-      document.getElementById("home"),
-      document.getElementById("tutorial"),
-      document.getElementById("materi"),
-      document.getElementById("tentangkami")
-    ];
+        <div
+          class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20"
+        >
+          <h3
+            class="font-bold text-primary mb-2 text-sm uppercase tracking-wider"
+          >
+            Penjelasan
+          </h3>
+          <p class="text-on-surface-variant leading-relaxed text-sm">
+            Properti flex-direction menentukan arah penyusunan elemen dalam
+            container flex.
+          </p>
+          <ul
+            class="list-disc list-inside space-y-2 text-sm text-on-surface-variant mt-2"
+          >
+            <li>
+              <strong class="text-secondary-fixed-dim">row:</strong> Elemen
+              disusun horizontal dari kiri ke kanan.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">row-reverse:</strong>
+              Elemen disusun horizontal dari kanan ke kiri.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">column:</strong> Elemen
+              disusun vertikal dari atas ke bawah.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">column-reverse:</strong>
+              Elemen disusun vertikal dari bawah ke atas.
+            </li>
+          </ul>
+        </div>
 
-    function updateIndicator(activeLink) {
-      if (!activeLink || !indicator) return;
-      indicator.style.left = `${activeLink.offsetLeft}px`;
-      indicator.style.width = `${activeLink.offsetWidth}px`;
-      
-      navLinks.forEach(link => {
-        if (link === activeLink) {
-          link.classList.remove("text-on-surface-variant");
-          link.classList.add("text-secondary-fixed");
-        } else {
-          link.classList.remove("text-secondary-fixed");
-          link.classList.add("text-on-surface-variant");
-        }
-      });
-    }
+        <div
+          class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20"
+        >
+          <h3
+            class="font-bold text-tertiary mb-2 text-sm uppercase tracking-wider"
+          >
+            Soal Latihan
+          </h3>
+          <p class="text-on-surface-variant leading-relaxed mb-4 text-sm">
+            Untuk membuat layout vertikal dari atas ke bawah, flex-direction apa
+            yang harus digunakan?
+          </p>
+          <form class="quiz-form space-y-3" data-correct="c">
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="direction"
+                value="a"
+                class="mr-2 accent-primary"
+              />
+              A. vertical
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="direction"
+                value="b"
+                class="mr-2 accent-primary"
+              />
+              B. row
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="direction"
+                value="c"
+                class="mr-2 accent-primary"
+              />
+              C. column
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="direction"
+                value="d"
+                class="mr-2 accent-primary"
+              />
+              D. top-bottom
+            </label>
+            <div
+              class="quiz-feedback hidden p-3 rounded-lg mt-3 text-center text-sm font-semibold"
+            >
+              <p class="answer-status"></p>
+              <p class="answer-hint hidden text-green-400 mt-1">
+                Jawaban yang benar: C. column
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
-    // Set initial position
-    setTimeout(() => {
-      const active = document.querySelector(".nav-link.text-secondary-fixed") || navLinks[0];
-      updateIndicator(active);
-    }, 200);
+    <div id="modal-order" class="modal">
+      <div
+        class="modal-content relative bg-surface-container border border-outline-variant/30 rounded-xl p-8 max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-on-surface"
+      >
+        <span
+          class="close absolute top-4 right-4 text-on-surface-variant hover:text-secondary cursor-pointer text-3xl font-bold bg-surface-bright/20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:rotate-90"
+          >&times;</span
+        >
+        <h2
+          class="font-headline-lg text-headline-lg text-secondary-fixed-dim mb-4 border-b border-outline-variant/30 pb-2"
+        >
+          order
+        </h2>
 
-    // Click handler
-    navLinks.forEach(link => {
-      link.addEventListener("click", () => {
-        updateIndicator(link);
-      });
-    });
+        <div
+          class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20"
+        >
+          <h3
+            class="font-bold text-primary mb-2 text-sm uppercase tracking-wider"
+          >
+            Penjelasan
+          </h3>
+          <p class="text-on-surface-variant leading-relaxed text-sm">
+            Properti order mengatur urutan tampilan elemen flex tanpa mengubah
+            HTML.
+          </p>
+          <ul
+            class="list-disc list-inside space-y-2 text-sm text-on-surface-variant mt-2"
+          >
+            <li>Menggunakan nilai angka (positif atau negatif).</li>
+            <li>Nilai lebih kecil tampil lebih dulu.</li>
+            <li>Nilai default adalah 0.</li>
+            <li>Berguna untuk responsive layout.</li>
+          </ul>
+        </div>
 
-    // Window resize handler to adjust indicator width/position
-    window.addEventListener("resize", () => {
-      const active = document.querySelector(".nav-link.text-secondary-fixed") || navLinks[0];
-      updateIndicator(active);
-    });
+        <div
+          class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20"
+        >
+          <h3
+            class="font-bold text-tertiary mb-2 text-sm uppercase tracking-wider"
+          >
+            Soal Latihan
+          </h3>
+          <p class="text-on-surface-variant leading-relaxed mb-4 text-sm">
+            Jika ada 3 elemen dengan order: 2, -1, dan 1, urutan tampilan yang
+            benar adalah:
+          </p>
+          <form class="quiz-form space-y-3" data-correct="b">
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="order"
+                value="a"
+                class="mr-2 accent-primary"
+              />
+              A. 2, 1, -1
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="order"
+                value="b"
+                class="mr-2 accent-primary"
+              />
+              B. -1, 1, 2
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="order"
+                value="c"
+                class="mr-2 accent-primary"
+              />
+              C. 1, 2, -1
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="order"
+                value="d"
+                class="mr-2 accent-primary"
+              />
+              D. 2, -1, 1
+            </label>
+            <div
+              class="quiz-feedback hidden p-3 rounded-lg mt-3 text-center text-sm font-semibold"
+            >
+              <p class="answer-status"></p>
+              <p class="answer-hint hidden text-green-400 mt-1">
+                Jawaban yang benar: B. -1, 1, 2
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
-    // IntersectionObserver to spy on scroll
-    const observerOptions = {
-      root: null,
-      rootMargin: "-25% 0px -55% 0px",
-      threshold: 0
-    };
+    <div id="modal-align-self" class="modal">
+      <div
+        class="modal-content relative bg-surface-container border border-outline-variant/30 rounded-xl p-8 max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-on-surface"
+      >
+        <span
+          class="close absolute top-4 right-4 text-on-surface-variant hover:text-secondary cursor-pointer text-3xl font-bold bg-surface-bright/20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:rotate-90"
+          >&times;</span
+        >
+        <h2
+          class="font-headline-lg text-headline-lg text-secondary-fixed-dim mb-4 border-b border-outline-variant/30 pb-2"
+        >
+          align-self
+        </h2>
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const id = entry.target.getAttribute("id");
-          const matchingLink = document.querySelector(`.nav-link[href="#${id}"]`);
-          if (matchingLink) {
-            updateIndicator(matchingLink);
-          }
-        }
-      });
-    }, observerOptions);
+        <div
+          class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20"
+        >
+          <h3
+            class="font-bold text-primary mb-2 text-sm uppercase tracking-wider"
+          >
+            Penjelasan
+          </h3>
+          <p class="text-on-surface-variant leading-relaxed text-sm">
+            Properti align-self mengatur perataan individual elemen, menimpa
+            align-items container.
+          </p>
+          <ul
+            class="list-disc list-inside space-y-2 text-sm text-on-surface-variant mt-2"
+          >
+            <li>
+              <strong class="text-secondary-fixed-dim">auto:</strong> Mengikuti
+              align-items container.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">flex-start:</strong>
+              Elemen diratakan di atas.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">center:</strong> Elemen
+              diratakan di tengah.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">flex-end:</strong> Elemen
+              diratakan di bawah.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">stretch:</strong> Elemen
+              diregangkan.
+            </li>
+          </ul>
+        </div>
 
-    sections.forEach(section => {
-      if (section) observer.observe(section);
-    });
+        <div
+          class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20"
+        >
+          <h3
+            class="font-bold text-tertiary mb-2 text-sm uppercase tracking-wider"
+          >
+            Soal Latihan
+          </h3>
+          <p class="text-on-surface-variant leading-relaxed mb-4 text-sm">
+            Jika ingin satu elemen berada di tengah vertikal sementara yang lain
+            mengikuti align-items container, nilai align-self apa yang
+            digunakan?
+          </p>
+          <form class="quiz-form space-y-3" data-correct="b">
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="align-self"
+                value="a"
+                class="mr-2 accent-primary"
+              />
+              A. middle
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="align-self"
+                value="b"
+                class="mr-2 accent-primary"
+              />
+              B. center
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="align-self"
+                value="c"
+                class="mr-2 accent-primary"
+              />
+              C. vertical-center
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="align-self"
+                value="d"
+                class="mr-2 accent-primary"
+              />
+              D. self-center
+            </label>
+            <div
+              class="quiz-feedback hidden p-3 rounded-lg mt-3 text-center text-sm font-semibold"
+            >
+              <p class="answer-status"></p>
+              <p class="answer-hint hidden text-green-400 mt-1">
+                Jawaban yang benar: B. center
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
-    // IntersectionObserver for scroll-reveal animations
-    const revealObserverOptions = {
-      root: null,
-      threshold: 0.1,
-      rootMargin: "0px 0px -50px 0px"
-    };
+    <div id="modal-flex-wrap" class="modal">
+      <div
+        class="modal-content relative bg-surface-container border border-outline-variant/30 rounded-xl p-8 max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-on-surface"
+      >
+        <span
+          class="close absolute top-4 right-4 text-on-surface-variant hover:text-secondary cursor-pointer text-3xl font-bold bg-surface-bright/20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:rotate-90"
+          >&times;</span
+        >
+        <h2
+          class="font-headline-lg text-headline-lg text-secondary-fixed-dim mb-4 border-b border-outline-variant/30 pb-2"
+        >
+          flex-wrap
+        </h2>
 
-    const revealObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("scroll-visible");
-          observer.unobserve(entry.target);
-        }
-      });
-    }, revealObserverOptions);
+        <div
+          class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20"
+        >
+          <h3
+            class="font-bold text-primary mb-2 text-sm uppercase tracking-wider"
+          >
+            Penjelasan
+          </h3>
+          <p class="text-on-surface-variant leading-relaxed text-sm">
+            Properti flex-wrap menentukan apakah elemen flex akan pindah baris
+            ketika tidak cukup ruang.
+          </p>
+          <ul
+            class="list-disc list-inside space-y-2 text-sm text-on-surface-variant mt-2"
+          >
+            <li>
+              <strong class="text-secondary-fixed-dim">nowrap:</strong> Elemen
+              tetap dalam satu baris (default).
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">wrap:</strong> Elemen
+              pindah ke baris baru bila perlu.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">wrap-reverse:</strong>
+              Elemen pindah ke baris baru dengan urutan terbalik.
+            </li>
+          </ul>
+        </div>
 
-    const revealElements = document.querySelectorAll(".scroll-hidden, .scroll-hidden-scale");
-    revealElements.forEach(el => {
-      revealObserver.observe(el);
-    });
+        <div
+          class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20"
+        >
+          <h3
+            class="font-bold text-tertiary mb-2 text-sm uppercase tracking-wider"
+          >
+            Soal Latihan
+          </h3>
+          <p class="text-on-surface-variant leading-relaxed mb-4 text-sm">
+            Nilai flex-wrap apa yang harus digunakan agar elemen otomatis pindah
+            ke baris baru saat container terlalu sempit?
+          </p>
+          <form class="quiz-form space-y-3" data-correct="c">
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="wrap"
+                value="a"
+                class="mr-2 accent-primary"
+              />
+              A. auto-wrap
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="wrap"
+                value="b"
+                class="mr-2 accent-primary"
+              />
+              B. break
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="wrap"
+                value="c"
+                class="mr-2 accent-primary"
+              />
+              C. wrap
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="wrap"
+                value="d"
+                class="mr-2 accent-primary"
+              />
+              D. new-line
+            </label>
+            <div
+              class="quiz-feedback hidden p-3 rounded-lg mt-3 text-center text-sm font-semibold"
+            >
+              <p class="answer-status"></p>
+              <p class="answer-hint hidden text-green-400 mt-1">
+                Jawaban yang benar: C. wrap
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
-    // Close mobile menu when clicking outside
-    document.addEventListener("click", function (e) {
-      const navMenu = document.querySelector(".nav-menu");
-      if (navMenu && !e.target.closest("header") && navMenu.classList.contains("show")) {
-        navMenu.classList.remove("show");
-      }
-    });
+    <div id="modal-flex-flow" class="modal">
+      <div
+        class="modal-content relative bg-surface-container border border-outline-variant/30 rounded-xl p-8 max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-on-surface"
+      >
+        <span
+          class="close absolute top-4 right-4 text-on-surface-variant hover:text-secondary cursor-pointer text-3xl font-bold bg-surface-bright/20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:rotate-90"
+          >&times;</span
+        >
+        <h2
+          class="font-headline-lg text-headline-lg text-secondary-fixed-dim mb-4 border-b border-outline-variant/30 pb-2"
+        >
+          flex-flow
+        </h2>
 
-    // Modal functionality
-    const modals = document.querySelectorAll(".modal");
-    const closeButtons = document.querySelectorAll(".close");
+        <div
+          class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20"
+        >
+          <h3
+            class="font-bold text-primary mb-2 text-sm uppercase tracking-wider"
+          >
+            Penjelasan
+          </h3>
+          <p class="text-on-surface-variant leading-relaxed text-sm">
+            Properti flex-flow adalah shorthand untuk flex-direction dan
+            flex-wrap.
+          </p>
+          <ul
+            class="list-disc list-inside space-y-2 text-sm text-on-surface-variant mt-2"
+          >
+            <li><strong>flex-flow: [direction] [wrap]</strong></li>
+            <li>Contoh: flex-flow: row wrap</li>
+            <li>Contoh: flex-flow: column nowrap</li>
+            <li>Lebih efisien daripada menulis dua properti terpisah.</li>
+          </ul>
+        </div>
 
-    // Open modal when any element with data-modal is clicked
-    document.querySelectorAll("[data-modal]").forEach((el) => {
-      el.addEventListener("click", function () {
-        const modalId = this.getAttribute("data-modal");
-        const modal = document.getElementById(`modal-${modalId}`);
-        if (modal) {
-          modal.classList.add("show");
-          document.body.style.overflow = "hidden"; // Prevent background scrolling
-        }
-      });
-    });
+        <div
+          class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20"
+        >
+          <h3
+            class="font-bold text-tertiary mb-2 text-sm uppercase tracking-wider"
+          >
+            Soal Latihan
+          </h3>
+          <p class="text-on-surface-variant leading-relaxed mb-4 text-sm">
+            Penulisan flex-flow yang benar untuk membuat layout vertikal dengan
+            pembungkusan adalah:
+          </p>
+          <form class="quiz-form space-y-3" data-correct="b">
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="flow"
+                value="a"
+                class="mr-2 accent-primary"
+              />
+              A. flex-flow: vertical wrap
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="flow"
+                value="b"
+                class="mr-2 accent-primary"
+              />
+              B. flex-flow: column wrap
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="flow"
+                value="c"
+                class="mr-2 accent-primary"
+              />
+              C. flex-flow: down wrap
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="flow"
+                value="d"
+                class="mr-2 accent-primary"
+              />
+              D. flex-flow: column-wrap
+            </label>
+            <div
+              class="quiz-feedback hidden p-3 rounded-lg mt-3 text-center text-sm font-semibold"
+            >
+              <p class="answer-status"></p>
+              <p class="answer-hint hidden text-green-400 mt-1">
+                Jawaban yang benar: B. flex-flow: column wrap
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
-    // Close modal when X button is clicked
-    closeButtons.forEach((closeBtn) => {
-      closeBtn.addEventListener("click", function () {
-        const modal = this.closest(".modal");
-        if (modal) {
-          modal.classList.remove("show");
-          document.body.style.overflow = "auto"; // Restore scrolling
-        }
-      });
-    });
+    <div id="modal-align-content" class="modal">
+      <div
+        class="modal-content relative bg-surface-container border border-outline-variant/30 rounded-xl p-8 max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-on-surface"
+      >
+        <span
+          class="close absolute top-4 right-4 text-on-surface-variant hover:text-secondary cursor-pointer text-3xl font-bold bg-surface-bright/20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:rotate-90"
+          >&times;</span
+        >
+        <h2
+          class="font-headline-lg text-headline-lg text-secondary-fixed-dim mb-4 border-b border-outline-variant/30 pb-2"
+        >
+          align-content
+        </h2>
 
-    // Close modal when clicking outside the modal content
-    modals.forEach((modal) => {
-      modal.addEventListener("click", function (e) {
-        if (e.target === modal) {
-          modal.classList.remove("show");
-          document.body.style.overflow = "auto"; // Restore scrolling
-        }
-      });
-    });
+        <div
+          class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20"
+        >
+          <h3
+            class="font-bold text-primary mb-2 text-sm uppercase tracking-wider"
+          >
+            Penjelasan
+          </h3>
+          <p class="text-on-surface-variant leading-relaxed text-sm">
+            Properti align-content mengatur jarak antar baris dalam container
+            flex multi-baris.
+          </p>
+          <ul
+            class="list-disc list-inside space-y-2 text-sm text-on-surface-variant mt-2"
+          >
+            <li>
+              <strong class="text-secondary-fixed-dim">flex-start:</strong>
+              Baris dikumpulkan di awal container.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">center:</strong> Baris
+              dikumpulkan di tengah container.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">flex-end:</strong> Baris
+              dikumpulkan di akhir container.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">space-between:</strong>
+              Baris didistribusikan merata.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">space-around:</strong>
+              Baris dengan jarak sama di sekitarnya.
+            </li>
+            <li>
+              <strong class="text-secondary-fixed-dim">stretch:</strong> Baris
+              diregangkan memenuhi container.
+            </li>
+          </ul>
+        </div>
 
-    // Close modal with Escape key
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") {
-        const openModal = document.querySelector(".modal.show");
-        if (openModal) {
-          openModal.classList.remove("show");
-          document.body.style.overflow = "auto"; // Restore scrolling
-        }
-      }
-    });
+        <div
+          class="modal-section mb-6 bg-surface-container-high/40 p-4 rounded-lg border border-outline-variant/20"
+        >
+          <h3
+            class="font-bold text-tertiary mb-2 text-sm uppercase tracking-wider"
+          >
+            Soal Latihan
+          </h3>
+          <p class="text-on-surface-variant leading-relaxed mb-4 text-sm">
+            Nilai align-content apa yang membuat jarak sama antar baris,
+            termasuk di atas dan bawah container?
+          </p>
+          <form class="quiz-form space-y-3" data-correct="a">
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="align-content"
+                value="a"
+                class="mr-2 accent-primary"
+              />
+              A. space-around
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="align-content"
+                value="b"
+                class="mr-2 accent-primary"
+              />
+              B. space-between
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="align-content"
+                value="c"
+                class="mr-2 accent-primary"
+              />
+              C. distribute
+            </label>
+            <label
+              class="block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200"
+            >
+              <input
+                type="radio"
+                name="align-content"
+                value="d"
+                class="mr-2 accent-primary"
+              />
+              D. even-spacing
+            </label>
+            <div
+              class="quiz-feedback hidden p-3 rounded-lg mt-3 text-center text-sm font-semibold"
+            >
+              <p class="answer-status"></p>
+              <p class="answer-hint hidden text-green-400 mt-1">
+                Jawaban yang benar: A. space-around
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
-    // Quiz functionality
-    document.querySelectorAll(".quiz-form").forEach((form) => {
-      const correctAnswer = form.dataset.correct;
-      const labels = form.querySelectorAll("label");
-      const feedback = form.querySelector(".quiz-feedback");
-      const answerStatus = feedback.querySelector(".answer-status");
-      const answerHint = feedback.querySelector(".answer-hint");
+    <div id="modal-handout" class="modal">
+      <div
+        class="modal-content relative bg-surface-container border border-outline-variant/30 rounded-xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-on-surface"
+      >
+        <span
+          class="close absolute top-4 right-4 text-on-surface-variant hover:text-secondary cursor-pointer text-3xl font-bold bg-surface-bright/20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:rotate-90"
+          >&times;</span
+        >
+        <h2
+          class="font-headline-lg text-headline-lg text-secondary-fixed-dim mb-4 border-b border-outline-variant/30 pb-2"
+        >
+          📖 Bahan Ajar Flexbox
+        </h2>
+        <p class="text-on-surface-variant leading-relaxed mb-6 text-sm">
+          Jelajahi ringkasan materi Flexbox lengkap untuk memperkuat
+          pemahamanmu. Kamu bisa gunakan Bahan Ajar ini sebagai panduan cepat
+          saat bermain game MagicFlex.
+        </p>
 
-      form.querySelectorAll('input[type="radio"]').forEach((input) => {
-        input.addEventListener("change", (e) => {
-          // Reset all labels
-          labels.forEach((l) => {
-            l.className = "block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200";
-          });
+        <!-- Tampilkan PDF langsung -->
+        <div
+          class="pdf-viewer border border-outline-variant/50 rounded-lg overflow-hidden mb-6"
+        >
+          <object
+            data="images/Handout Magicflex Flexbox CSS.pdf"
+            type="application/pdf"
+            width="100%"
+            height="600px"
+          >
+            <p class="p-6 text-center text-on-surface-variant text-sm">
+              Browser Anda tidak mendukung tampilan PDF langsung.
+              <a
+                href="images/Handout Magicflex Flexbox CSS.pdf"
+                target="_blank"
+                class="text-primary hover:underline font-semibold"
+                >Klik di sini untuk membuka PDF</a
+              >
+            </p>
+          </object>
+        </div>
 
-          // Show feedback
-          feedback.classList.remove("hidden");
+        <!-- Tombol unduh dan buka di tab baru -->
+        <div class="flex items-center gap-4 justify-end">
+          <a
+            href="images/Handout Magicflex Flexbox CSS.pdf"
+            download
+            class="bg-surface-bright text-on-surface font-semibold px-6 py-3 rounded-lg border border-outline-variant/50 shadow-md hover:bg-surface-container-highest transition-all duration-300"
+          >
+            💾 Unduh PDF
+          </a>
+          <a
+            href="images/Handout Magicflex Flexbox CSS.pdf"
+            target="_blank"
+            class="bg-primary-container text-on-primary-container font-semibold px-6 py-3 rounded-lg border border-primary/30 shadow-lg hover:bg-primary hover:text-on-primary transition-all duration-300"
+          >
+            🔍 Buka di Tab Baru
+          </a>
+        </div>
+      </div>
+    </div>
 
-          // Handle the selected answer
-          const selectedLabel = e.target.closest("label");
-          selectedLabel.classList.add("border-primary");
-
-          if (e.target.value === correctAnswer) {
-            selectedLabel.classList.add("bg-green-950/40");
-            selectedLabel.classList.add("border-green-500/50");
-            answerStatus.textContent = "✨ Benar! Bagus sekali!";
-            answerStatus.className = "answer-status text-green-400 font-bold text-center";
-          } else {
-            selectedLabel.classList.add("bg-red-950/40");
-            selectedLabel.classList.add("border-red-500/50");
-            answerStatus.textContent = "❌ Ups, coba lagi!";
-            answerStatus.className = "answer-status text-red-400 font-bold text-center";
-          }
-
-          // Show the correct answer with animation
-          setTimeout(() => {
-            labels.forEach((label) => {
-              const input = label.querySelector("input");
-              if (input.value === correctAnswer) {
-                label.classList.add("bg-green-950/40");
-                label.classList.add("border-green-500/50");
-              }
+    <script>
+      // Smooth scrolling for navigation links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute("href"));
+          if (target) {
+            target.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
             });
-            answerHint.classList.remove("hidden");
-          }, 1000);
+          }
         });
       });
-    });
 
-    // Scroll to top on page load
-    window.scrollTo(0, 0);
-  });
-</script>
-</body>
+      // Initialize when DOM is loaded
+      document.addEventListener("DOMContentLoaded", function () {
+        // Sliding nav indicator logic
+        const nav = document.getElementById("main-nav");
+        const indicator = document.getElementById("nav-indicator");
+        const navLinks = document.querySelectorAll(".nav-link");
+        const sections = [
+          document.getElementById("home"),
+          document.getElementById("tutorial"),
+          document.getElementById("materi"),
+          document.getElementById("tentangkami"),
+        ];
+
+        function updateIndicator(activeLink) {
+          if (!activeLink || !indicator) return;
+          indicator.style.left = `${activeLink.offsetLeft}px`;
+          indicator.style.width = `${activeLink.offsetWidth}px`;
+
+          navLinks.forEach((link) => {
+            if (link === activeLink) {
+              link.classList.remove("text-on-surface-variant");
+              link.classList.add("text-secondary-fixed");
+            } else {
+              link.classList.remove("text-secondary-fixed");
+              link.classList.add("text-on-surface-variant");
+            }
+          });
+        }
+
+        // Set initial position
+        setTimeout(() => {
+          const active =
+            document.querySelector(".nav-link.text-secondary-fixed") ||
+            navLinks[0];
+          updateIndicator(active);
+        }, 200);
+
+        // Click handler
+        navLinks.forEach((link) => {
+          link.addEventListener("click", () => {
+            updateIndicator(link);
+          });
+        });
+
+        // Window resize handler to adjust indicator width/position
+        window.addEventListener("resize", () => {
+          const active =
+            document.querySelector(".nav-link.text-secondary-fixed") ||
+            navLinks[0];
+          updateIndicator(active);
+        });
+
+        // IntersectionObserver to spy on scroll
+        const observerOptions = {
+          root: null,
+          rootMargin: "-25% 0px -55% 0px",
+          threshold: 0,
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const id = entry.target.getAttribute("id");
+              const matchingLink = document.querySelector(
+                `.nav-link[href="#${id}"]`,
+              );
+              if (matchingLink) {
+                updateIndicator(matchingLink);
+              }
+            }
+          });
+        }, observerOptions);
+
+        sections.forEach((section) => {
+          if (section) observer.observe(section);
+        });
+
+        // IntersectionObserver for scroll-reveal animations
+        const revealObserverOptions = {
+          root: null,
+          threshold: 0.1,
+          rootMargin: "0px 0px -50px 0px",
+        };
+
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("scroll-visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        }, revealObserverOptions);
+
+        const revealElements = document.querySelectorAll(
+          ".scroll-hidden, .scroll-hidden-scale",
+        );
+        revealElements.forEach((el) => {
+          revealObserver.observe(el);
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener("click", function (e) {
+          const navMenu = document.querySelector(".nav-menu");
+          if (
+            navMenu &&
+            !e.target.closest("header") &&
+            navMenu.classList.contains("show")
+          ) {
+            navMenu.classList.remove("show");
+          }
+        });
+
+        // Modal functionality
+        const modals = document.querySelectorAll(".modal");
+        const closeButtons = document.querySelectorAll(".close");
+
+        // Open modal when any element with data-modal is clicked
+        document.querySelectorAll("[data-modal]").forEach((el) => {
+          el.addEventListener("click", function () {
+            const modalId = this.getAttribute("data-modal");
+            const modal = document.getElementById(`modal-${modalId}`);
+            if (modal) {
+              modal.classList.add("show");
+              document.body.style.overflow = "hidden"; // Prevent background scrolling
+            }
+          });
+        });
+
+        // Close modal when X button is clicked
+        closeButtons.forEach((closeBtn) => {
+          closeBtn.addEventListener("click", function () {
+            const modal = this.closest(".modal");
+            if (modal) {
+              modal.classList.remove("show");
+              document.body.style.overflow = "auto"; // Restore scrolling
+            }
+          });
+        });
+
+        // Close modal when clicking outside the modal content
+        modals.forEach((modal) => {
+          modal.addEventListener("click", function (e) {
+            if (e.target === modal) {
+              modal.classList.remove("show");
+              document.body.style.overflow = "auto"; // Restore scrolling
+            }
+          });
+        });
+
+        // Close modal with Escape key
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape") {
+            const openModal = document.querySelector(".modal.show");
+            if (openModal) {
+              openModal.classList.remove("show");
+              document.body.style.overflow = "auto"; // Restore scrolling
+            }
+          }
+        });
+
+        // Quiz functionality
+        document.querySelectorAll(".quiz-form").forEach((form) => {
+          const correctAnswer = form.dataset.correct;
+          const labels = form.querySelectorAll("label");
+          const feedback = form.querySelector(".quiz-feedback");
+          const answerStatus = feedback.querySelector(".answer-status");
+          const answerHint = feedback.querySelector(".answer-hint");
+
+          form.querySelectorAll('input[type="radio"]').forEach((input) => {
+            input.addEventListener("change", (e) => {
+              // Reset all labels
+              labels.forEach((l) => {
+                l.className =
+                  "block cursor-pointer p-3 rounded-lg bg-background hover:bg-surface-bright/20 border border-outline-variant/30 transition-all duration-200";
+              });
+
+              // Show feedback
+              feedback.classList.remove("hidden");
+
+              // Handle the selected answer
+              const selectedLabel = e.target.closest("label");
+              selectedLabel.classList.add("border-primary");
+
+              if (e.target.value === correctAnswer) {
+                selectedLabel.classList.add("bg-green-950/40");
+                selectedLabel.classList.add("border-green-500/50");
+                answerStatus.textContent = "✨ Benar! Bagus sekali!";
+                answerStatus.className =
+                  "answer-status text-green-400 font-bold text-center";
+              } else {
+                selectedLabel.classList.add("bg-red-950/40");
+                selectedLabel.classList.add("border-red-500/50");
+                answerStatus.textContent = "❌ Ups, coba lagi!";
+                answerStatus.className =
+                  "answer-status text-red-400 font-bold text-center";
+              }
+
+              // Show the correct answer with animation
+              setTimeout(() => {
+                labels.forEach((label) => {
+                  const input = label.querySelector("input");
+                  if (input.value === correctAnswer) {
+                    label.classList.add("bg-green-950/40");
+                    label.classList.add("border-green-500/50");
+                  }
+                });
+                answerHint.classList.remove("hidden");
+              }, 1000);
+            });
+          });
+        });
+
+        // Scroll to top on page load
+        window.scrollTo(0, 0);
+      });
+    </script>
+  </body>
 </html>
