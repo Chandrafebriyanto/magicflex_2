@@ -39,6 +39,11 @@ var game = {
   clickedCode: null,
   levelRunCounts: (localStorage.levelRunCounts && JSON.parse(localStorage.levelRunCounts)) || {},
 
+  // Time tracking
+  gameStartTime: localStorage.getItem("gameStartTime")
+    ? parseInt(localStorage.getItem("gameStartTime"), 10)
+    : null,
+
   // Timer properties
   timer: null,
   timerStarted: false,
@@ -55,6 +60,12 @@ var game = {
    */
   startTimer: function () {
     if (this.timerStarted) return;
+
+    // Record the game start time if not already set (survives page reload)
+    if (!this.gameStartTime) {
+      this.gameStartTime = Date.now();
+      localStorage.setItem("gameStartTime", this.gameStartTime);
+    }
 
     this.timerStarted = true;
     var timerDisplay = document.getElementById("timer");
@@ -93,6 +104,8 @@ var game = {
     clearInterval(this.timer);
     this.timeLeft = 1800; // 30 minutes
     localStorage.removeItem("timeLeft");
+    this.gameStartTime = null;
+    localStorage.removeItem("gameStartTime");
   },
 
   // ===========================================
@@ -548,8 +561,18 @@ var game = {
       performanceIcon = "💪";
     }
 
+    // Hitung waktu pengerjaan
+    let waktuPengerjaan = "N/A";
+    if (this.gameStartTime) {
+      const elapsedMs = Date.now() - this.gameStartTime;
+      const totalSeconds = Math.floor(elapsedMs / 1000);
+      const mins = Math.floor(totalSeconds / 60);
+      const secs = totalSeconds % 60;
+      waktuPengerjaan = `${mins} menit ${secs < 10 ? "0" : ""}${secs} detik`;
+    }
+
     // KIRIM DATA OTOMATIS KE SPREADSHEET (Tetap Berjalan)
-    this.autoSaveData({ playerName, playerAbsence, score });
+    this.autoSaveData({ playerName, playerAbsence, score, waktuPengerjaan });
 
     // Data yang akan dikirim ke Prompt AI
     const quizDataForAI = {
@@ -730,6 +753,7 @@ Gunakan bahasa Indonesia yang kasual, ramah, dan ringkas (maksimal 3 paragraf). 
     formData.append("nama", quizData.playerName);
     formData.append("kelas", quizData.playerAbsence);
     formData.append("skor", quizData.score);
+    formData.append("waktuPengerjaan", quizData.waktuPengerjaan || "N/A");
     formData.append("detailJawaban", JSON.stringify(statusTiapSoal));
 
     fetch(googleScriptUrl, {
