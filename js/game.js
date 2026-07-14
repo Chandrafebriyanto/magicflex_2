@@ -192,6 +192,11 @@ var game = {
     this.level = 0;
     this.answers = {};
     this.solved = [];
+    
+    // Tambahkan dua baris ini untuk mereset riwayat percobaan
+    this.levelRunCounts = {};
+    localStorage.removeItem("levelRunCounts");
+
     this.loadLevel(levels[0]);
 
     // Clear player data
@@ -746,15 +751,25 @@ Gunakan bahasa Indonesia yang kasual, ramah, dan ringkas (maksimal 3 paragraf). 
    */
   autoSaveData: function (quizData) {
     // Memasukkan URL Apps Script terakhirmu
-    const googleScriptUrl = "https://script.google.com/macros/s/AKfycbzB2jEXyMOGI9B3iS1FDzaiQ7Snl0Av8Bswt0D3WYV79BWY7wd04xmxgIs7NIC2QFBXiw/exec";
-    const statusTiapSoal = levels.map(level => this.solved.includes(level.name) ? "Benar" : "Salah");
+    const googleScriptUrl = "https://script.google.com/macros/s/AKfycbytl1ewpr9tXB88d3rO1S6FhpRnj8JKLR0B71655UTPczvcACNpA8_wJvnwSiuTU5cG9Q/exec";
+    
+    // Format detailJawaban sebagai objek {tries, status} agar sesuai dengan Apps Script
+    const detailJawaban = levels.map(level => {
+      const levelId = level.name;
+      const tries = this.levelRunCounts ? (this.levelRunCounts[levelId] || 0) : 0;
+      const isSolved = this.solved.includes(levelId);
+      return {
+        tries: tries,
+        status: isSolved ? "Benar" : "Salah"
+      };
+    });
 
     const formData = new URLSearchParams();
     formData.append("nama", quizData.playerName);
-    formData.append("kelas", quizData.playerAbsence);
+    formData.append("absen", quizData.playerAbsence);
     formData.append("skor", quizData.score);
     formData.append("waktuPengerjaan", quizData.waktuPengerjaan || "N/A");
-    formData.append("detailJawaban", JSON.stringify(statusTiapSoal));
+    formData.append("detailJawaban", JSON.stringify(detailJawaban));
 
     fetch(googleScriptUrl, {
       method: "POST",
@@ -873,7 +888,7 @@ Gunakan bahasa Indonesia yang kasual, ramah, dan ringkas (maksimal 3 paragraf). 
    */
   shareResults: function (quizData) {
     const googleScriptUrl =
-      "https://script.google.com/macros/s/AKfycbw7ntIrknsJnYupRTLR5M28-eTHLKapEiBlcQlIoCQSIr8q5mz_NVO5u49BfEpU5ks/exec";
+      "https://script.google.com/macros/s/AKfycbytl1ewpr9tXB88d3rO1S6FhpRnj8JKLR0B71655UTPczvcACNpA8_wJvnwSiuTU5cG9Q/exec";
 
     fetch(googleScriptUrl, {
       method: "POST",
@@ -1141,7 +1156,7 @@ Gunakan bahasa Indonesia yang kasual, ramah, dan ringkas (maksimal 3 paragraf). 
     //   },
     // );
     // Tombol Cast Spell (Evaluate)
-    $("#next").on("click", async function () {
+    $("#next").off("click").on("click", async function () {
       $("#code").focus();
 
       // 1. Tambah hitungan percobaan (tries) setiap kali tombol diklik
@@ -1538,42 +1553,33 @@ compare: function () {
       $("#next").removeClass("animated animation").addClass("disabled");
     }
   },
+  
   /**
-   * Sinkronisasi data real-time ke Spreadsheet tanpa harus klik tombol
+   * Sinkronisasi data real-time ke Spreadsheet (Dinonaktifkan agar data dikirim hanya sekali di akhir)
    */
   liveSyncData: function () {
-    // const playerName = localStorage.getItem("playerName");
-    // const playerAbsence = localStorage.getItem("playerAbsence");
-    // if (!playerName || !playerAbsence) return;
-
-    // // GANTI DENGAN URL APPS SCRIPT KAMU YANG BARU
-    // const googleScriptUrl = "https://script.google.com/macros/s/AKfycbzB2jEXyMOGI9B3iS1FDzaiQ7Snl0Av8Bswt0D3WYV79BWY7wd04xmxgIs7NIC2QFBXiw/exec";
-    
-    // const score = Math.round((this.solved.length / levels.length) * 100);
-    // const statusTiapSoal = levels.map(level => this.solved.includes(level.name) ? "Benar" : "Salah");
-
-    // const formData = new URLSearchParams();
-    // formData.append("nama", playerName);
-    // formData.append("kelas", playerAbsence);
-    // formData.append("skor", score);
-    // formData.append("detailJawaban", JSON.stringify(statusTiapSoal));
-
-    // fetch(googleScriptUrl, {
-    //   method: "POST",
-    //   mode: "no-cors",
-    //   body: formData,
-    // }).catch(err => console.error("Sync error:", err));
     const playerName = localStorage.getItem("playerName");
     const playerAbsence = localStorage.getItem("playerAbsence");
     if (!playerName || !playerAbsence) return;
 
-    const googleScriptUrl = "https://script.google.com/macros/s/AKfycbxxLPrMormEmgmez5T_5Oinz4-Bt1Fm6txm84WiCwJSorfrUHevhaRrSFiDSW_zf0ZnnQ/exec";
+    // GANTI DENGAN URL APPS SCRIPT BARUMU
+    const googleScriptUrl = "https://script.google.com/macros/s/AKfycbytl1ewpr9tXB88d3rO1S6FhpRnj8JKLR0B71655UTPczvcACNpA8_wJvnwSiuTU5cG9Q/exec"; 
     
     const score = Math.round((this.solved.length / levels.length) * 100);
     
-    // Ubah data yang dikirim menjadi jumlah percobaan dan status
+    // Hitung waktu pengerjaan secara live
+    let waktuPengerjaan = "N/A";
+    if (this.gameStartTime) {
+      const elapsedMs = Date.now() - this.gameStartTime;
+      const totalSeconds = Math.floor(elapsedMs / 1000);
+      const mins = Math.floor(totalSeconds / 60);
+      const secs = totalSeconds % 60;
+      waktuPengerjaan = `${mins} menit ${secs < 10 ? "0" : ""}${secs} detik`;
+    }
+    
     const detailJawaban = levels.map(level => {
         const levelId = level.name;
+        // Mengambil jumlah klik Cast Spell dari levelRunCounts
         const tries = this.levelRunCounts ? (this.levelRunCounts[levelId] || 0) : 0;
         const isSolved = this.solved.includes(levelId);
         return {
@@ -1584,8 +1590,9 @@ compare: function () {
 
     const formData = new URLSearchParams();
     formData.append("nama", playerName);
-    formData.append("kelas", playerAbsence);
+    formData.append("absen", playerAbsence);
     formData.append("skor", score);
+    formData.append("waktuPengerjaan", waktuPengerjaan); // Waktu pengerjaan dikirim ke Apps Script
     formData.append("detailJawaban", JSON.stringify(detailJawaban));
 
     fetch(googleScriptUrl, {
