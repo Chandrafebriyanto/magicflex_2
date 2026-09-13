@@ -31,6 +31,8 @@ var game = {
   // ===========================================
 
   // Game state
+  googleScriptUrl:
+    "https://script.google.com/macros/s/AKfycbyfdnQgBWcSy6PaEfka9HyTwZ0OK8va_p-gBwlDSLAc5LKV4UA0Adhyrml6AsXksHZtBw/exec",
   language: window.location.hash.substring(1) || "id",
   level: parseInt(localStorage.level, 10) || 0,
   answers: (localStorage.answers && JSON.parse(localStorage.answers)) || {},
@@ -78,12 +80,12 @@ var game = {
         var minutes = Math.floor(game.timeLeft / 60);
         var seconds = game.timeLeft % 60;
         var display = ` ${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-        timerDisplay.textContent = display;
+        if (timerDisplay) timerDisplay.textContent = display;
         // Sync mobile timer
         var mobileTimer = document.getElementById("timer-mobile");
         if (mobileTimer) mobileTimer.textContent = display;
       } else {
-        game.endGame();
+        game.handleTimeout();
       }
     }, 1000);
   },
@@ -108,6 +110,61 @@ var game = {
     localStorage.removeItem("gameStartTime");
   },
 
+  /**
+   * Menangani kondisi ketika waktu pengerjaan lebih dari 30 menit (timeout)
+   * Menghapus data pengerjaan dari Spreadsheet secara otomatis.
+   */
+  handleTimeout: function () {
+    this.stopTimer();
+    this.deleteSpreadsheetData();
+
+    if (typeof Swal !== "undefined") {
+      Swal.fire({
+        icon: "error",
+        title: "⏰ Waktu Habis!",
+        html: '<p style="font-size:1em;">Waktu pengerjaan telah melebihi <strong>30 menit</strong>.</p><p style="font-size:0.9em;color:#ef4444;margin-top:8px;">Sesuai ketentuan, data pengerjaan kamu di spreadsheet telah <strong>dihapus secara otomatis</strong>.</p>',
+        confirmButtonText: "🔄 Ulangi dari Awal",
+        allowOutsideClick: false,
+        customClass: { confirmButton: "swal2-biru-btn", popup: "swal2-enhanced-popup" },
+      }).then(() => {
+        this.resetGame();
+        localStorage.removeItem("playerName");
+        localStorage.removeItem("playerAbsence");
+        location.reload();
+      });
+    } else {
+      alert("Waktu Habis! Waktu pengerjaan telah melebihi 30 menit. Data kamu di spreadsheet telah dihapus.");
+      this.resetGame();
+      localStorage.removeItem("playerName");
+      localStorage.removeItem("playerAbsence");
+      location.reload();
+    }
+  },
+
+  /**
+   * Menghapus data siswa dari Google Spreadsheet
+   */
+  deleteSpreadsheetData: function () {
+    const playerName = localStorage.getItem("playerName");
+    const playerAbsence = localStorage.getItem("playerAbsence");
+    if (!playerName || !playerAbsence) return Promise.resolve();
+
+    const formData = new URLSearchParams();
+    formData.append("action", "delete");
+    formData.append("nama", playerName);
+    formData.append("absen", playerAbsence);
+
+    return fetch(this.googleScriptUrl, {
+      method: "POST",
+      mode: "no-cors",
+      body: formData,
+    }).then(() => {
+      console.log("Data pengerjaan berhasil dihapus dari Spreadsheet karena waktu habis.");
+    }).catch(err => {
+      console.error("Gagal menghapus data dari Spreadsheet:", err);
+    });
+  },
+
   // ===========================================
   // GAME FLOW METHODS
   // ===========================================
@@ -121,6 +178,16 @@ var game = {
 
     if (!savedName || !savedAbsence) {
       this.showInputPopup();
+      return;
+    }
+
+    // Cek jika waktu pengerjaan sudah melebihi 30 menit (1800 detik)
+    if (this.gameStartTime && Date.now() - this.gameStartTime >= 1800 * 1000) {
+      this.handleTimeout();
+      return;
+    }
+    if (this.timeLeft <= 0) {
+      this.handleTimeout();
       return;
     }
 
@@ -161,6 +228,7 @@ var game = {
    */
   next: function () {
     this.level++;
+    this.changed = false;
     this.loadLevel(levels[this.level]);
     this.generateProgressDots();
     this.updateNextLevelBtn();
@@ -731,15 +799,6 @@ Gunakan bahasa Indonesia yang kasual, ramah, dan ringkas (maksimal 3 paragraf). 
   /**
    * Share results via WhatsApp only
    */
-  shareResults: function (quizData) {
-    const shareText = `Saya mendapat skor ${quizData.score}% di game CSS! Ayo coba kalahkan skorku!`;
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
-    window.open(whatsappUrl, "_blank");
-  },
-
-  /**
-   * Share results via WhatsApp only
-   */
   shareResults: function (score) {
     const shareText = `Saya mendapat skor ${score}% di game CSS! Ayo coba kalahkan skorku!`;
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
@@ -750,9 +809,6 @@ Gunakan bahasa Indonesia yang kasual, ramah, dan ringkas (maksimal 3 paragraf). 
    * Mengirim data ke Google Sheets secara otomatis (Background)
    */
   autoSaveData: function (quizData) {
-    // Memasukkan URL Apps Script terakhirmu
-    const googleScriptUrl = "https://script.google.com/macros/s/AKfycbytl1ewpr9tXB88d3rO1S6FhpRnj8JKLR0B71655UTPczvcACNpA8_wJvnwSiuTU5cG9Q/exec";
-    
     // Format detailJawaban sebagai objek {tries, status} agar sesuai dengan Apps Script
     const detailJawaban = levels.map(level => {
       const levelId = level.name;
@@ -771,7 +827,7 @@ Gunakan bahasa Indonesia yang kasual, ramah, dan ringkas (maksimal 3 paragraf). 
     formData.append("waktuPengerjaan", quizData.waktuPengerjaan || "N/A");
     formData.append("detailJawaban", JSON.stringify(detailJawaban));
 
-    fetch(googleScriptUrl, {
+    fetch(this.googleScriptUrl, {
       method: "POST",
       mode: "no-cors",
       body: formData,
@@ -883,38 +939,6 @@ Gunakan bahasa Indonesia yang kasual, ramah, dan ringkas (maksimal 3 paragraf). 
     }
   },
 
-  /**
-   * Share results via WhatsApp and Google Sheets
-   */
-  shareResults: function (quizData) {
-    const googleScriptUrl =
-      "https://script.google.com/macros/s/AKfycbytl1ewpr9tXB88d3rO1S6FhpRnj8JKLR0B71655UTPczvcACNpA8_wJvnwSiuTU5cG9Q/exec";
-
-    fetch(googleScriptUrl, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(quizData),
-    })
-      .then(() => {
-        const shareText = `I scored ${quizData.score}/100 in the quiz! Check it out!`;
-        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
-        window.open(whatsappUrl, "_blank");
-      })
-      .catch((error) => {
-        console.error("Error saving data:", error);
-        if (typeof Swal !== "undefined") {
-          Swal.fire(
-            "Error",
-            "Failed to save results. Please try again.",
-            "error",
-          );
-        } else {
-          alert("Error: Failed to save results. Please try again.");
-        }
-      });
-  },
-
   // ===========================================
   // LEVEL MANAGEMENT METHODS
   // ===========================================
@@ -966,25 +990,51 @@ Gunakan bahasa Indonesia yang kasual, ramah, dan ringkas (maksimal 3 paragraf). 
       }
     });
 
-    $(".arrow.right").on("click", function () {
-      if (!$(this).hasClass("disabled")) {
-        // Blokir navigasi maju jika soal saat ini belum solved
-        var currentLevelName = levels[game.level].name;
-        if ($.inArray(currentLevelName, game.solved) === -1) {
-          if (typeof Swal !== "undefined") {
-            Swal.fire({
-              icon: "warning",
-              title: "⚠️ Belum Bisa Lanjut",
-              html: '<p style="font-size:0.95em;">Kamu harus <strong>menyelesaikan soal ini</strong> terlebih dahulu sebelum bisa lanjut.</p>',
-              confirmButtonText: "OK",
-              customClass: { confirmButton: "swal2-biru-btn", popup: "swal2-enhanced-popup" },
-            });
-          }
+    $(".arrow.right").on("click", async function () {
+      if (!$(this).hasClass("disabled") && !game.isAdvancing) {
+        const levelId = levels[game.level].name;
+
+        game.levelRunCounts = game.levelRunCounts || {};
+        game.levelRunCounts[levelId] = (game.levelRunCounts[levelId] || 0) + 1;
+
+        await game.check();
+        const isSolved = $.inArray(levelId, game.solved) !== -1;
+
+        if (!isSolved) {
+          game.tryagain();
+          game.showErrorNotification();
+          game.liveSyncData();
           return;
         }
-        game.saveAnswer();
-        game.next();
-        game.generateProgressDots();
+
+        game.isAdvancing = true;
+        $(".frog").addClass("animated bounceOutUp");
+        $(".arrow, #next, #nextLevelBtn").addClass("disabled");
+
+        if (typeof Swal !== "undefined") {
+          Swal.fire({
+            icon: "success",
+            title: "✨ Jawaban Benar!",
+            text: "Hebat! Kode CSS kamu sudah tepat. Melanjutkan ke soal berikutnya...",
+            timer: 1600,
+            timerProgressBar: true,
+            showConfirmButton: false,
+            customClass: { popup: "swal2-enhanced-popup" },
+          });
+        }
+
+        setTimeout(function () {
+          game.isAdvancing = false;
+          game.saveAnswer();
+          game.liveSyncData();
+
+          if (game.level >= levels.length - 1) {
+            game.endGame();
+          } else {
+            game.next();
+            game.generateProgressDots();
+          }
+        }, 1600);
       }
     });
   },
@@ -1155,80 +1205,69 @@ Gunakan bahasa Indonesia yang kasual, ramah, dan ringkas (maksimal 3 paragraf). 
     //     $(this).removeClass();
     //   },
     // );
-    // Tombol Cast Spell (Evaluate)
+    // Tombol Cast Spell (Hanya untuk testing/menjalankan kode visual di layar)
     $("#next").off("click").on("click", async function () {
       $("#code").focus();
 
-      // 1. Tambah hitungan percobaan (tries) setiap kali tombol diklik
+      // Jalankan & terapkan kode CSS secara visual untuk testing
+      await game.check();
+      game.changed = false;
+
+      // Simpan status ke localStorage untuk persistence
+      localStorage.setItem("levelRunCounts", JSON.stringify(game.levelRunCounts || {}));
+    });
+
+    // Next Level / Finish button (Validasi apakah jawaban benar sebelum lanjut)
+    $("#nextLevelBtn").on("click", async function () {
+      if ($(this).hasClass("disabled") || game.isAdvancing) return;
+
       const levelId = levels[game.level].name;
+
+      // Tambah hitungan percobaan saat validasi akhir (tombol Lanjut)
       game.levelRunCounts = game.levelRunCounts || {};
       game.levelRunCounts[levelId] = (game.levelRunCounts[levelId] || 0) + 1;
 
-      // 2. Jalankan pengecekan CSS secara manual
+      // Evaluasi kode terkini
       await game.check();
-
-      // 3. Cek apakah jawaban benar
-      const isCorrect = $.inArray(levelId, game.solved) !== -1;
-
-      if (isCorrect) {
-        $(this).removeClass("animated animation");
-        $(".frog").addClass("animated bounceOutUp");
-        $(".arrow, #next").addClass("disabled");
-
-        // Tampilkan notifikasi benar
-        if (typeof Swal !== "undefined") {
-          Swal.fire({
-            icon: "success",
-            title: "✨ Benar!",
-            text: "Kode CSS kamu sudah tepat! Lanjut ke soal berikutnya.",
-            timer: 1800,
-            timerProgressBar: true,
-            showConfirmButton: false,
-            customClass: { popup: "swal2-enhanced-popup" },
-          });
-        }
-
-        setTimeout(function () {
-          if (game.level >= levels.length - 1) {
-            game.endGame();
-          } else {
-            game.next();
-          }
-        }, 2000);
-      } else {
-        // Jika salah, layar bergetar & tampilkan notifikasi error detail
-        game.tryagain();
-        game.showErrorNotification();
-        if (typeof game.liveSyncData === 'function') game.liveSyncData();
-      }
-    });
-
-    // Next Level / Finish button (blocked if not solved)
-    $("#nextLevelBtn").on("click", function () {
-      const levelId = levels[game.level].name;
       const isSolved = $.inArray(levelId, game.solved) !== -1;
 
       if (!isSolved) {
-        // Blokir navigasi jika soal belum benar
-        if (typeof Swal !== "undefined") {
-          Swal.fire({
-            icon: "warning",
-            title: "⚠️ Belum Bisa Lanjut",
-            html: '<p style="font-size:0.95em;">Kamu harus <strong>menjawab soal ini dengan benar</strong> terlebih dahulu sebelum bisa lanjut ke soal berikutnya.</p><p style="font-size:0.85em;color:#94a3b8;margin-top:8px;">Ketik kode CSS yang tepat lalu klik <b>Cast Spell</b>.</p>',
-            confirmButtonText: "OK, Saya Coba Lagi",
-            customClass: { confirmButton: "swal2-biru-btn", popup: "swal2-enhanced-popup" },
-          });
-        }
+        // Jika jawaban belum benar: getarkan editor & tampilkan peringatan kesalahan
+        game.tryagain();
+        game.showErrorNotification();
+        game.liveSyncData();
         return;
       }
 
-      game.saveAnswer();
-      if (game.level >= levels.length - 1) {
-        game.endGame();
-      } else {
-        game.next();
-        game.generateProgressDots();
+      // Jika jawaban benar: tampilkan validasi sukses & animasi sebelum lanjut
+      game.isAdvancing = true;
+      $(".frog").addClass("animated bounceOutUp");
+      $(".arrow, #next, #nextLevelBtn").addClass("disabled");
+
+      if (typeof Swal !== "undefined") {
+        Swal.fire({
+          icon: "success",
+          title: "✨ Jawaban Benar!",
+          text: "Hebat! Kode CSS kamu sudah tepat. Melanjutkan ke soal berikutnya...",
+          timer: 1600,
+          timerProgressBar: true,
+          showConfirmButton: false,
+          customClass: { popup: "swal2-enhanced-popup" },
+        });
       }
+
+      setTimeout(function () {
+        game.isAdvancing = false;
+        game.saveAnswer();
+        game.liveSyncData();
+
+        if (game.level >= levels.length - 1) {
+          game.endGame();
+        } else {
+          game.next();
+          game.generateProgressDots();
+        }
+      }, 1600);
     });
 
     // Code input events
@@ -1435,17 +1474,9 @@ Gunakan bahasa Indonesia yang kasual, ramah, dan ringkas (maksimal 3 paragraf). 
   // },
 
   /**
-   * Check if current solution is correct
+   * Check if current solution is correct and apply visual styles
    */
   check: async function () {
-    const code = $("#code").val().trim();
-    
-    // 1. ALIEN TIDAK BERGERAK SEBELUM KODE LENGKAP
-    // Alien baru bergerak & sistem mengecek jika kode sudah diakhiri titik koma (;) atau dihapus sampai kosong
-    if (code.length > 0 && !code.endsWith(";")) {
-      return; 
-    }
-
     if (!document.startViewTransition) {
       this.applyStyles();
       this.compare();
@@ -1508,7 +1539,7 @@ Gunakan bahasa Indonesia yang kasual, ramah, dan ringkas (maksimal 3 paragraf). 
   //   // 2. LANGSUNG REKAM/UPDATE KE SPREADSHEET
   //   this.liveSyncData();
   // },
-compare: function () {
+  compare: function () {
     const level = levels[this.level];
     const lilypads = {};
     const frogs = {};
@@ -1534,36 +1565,38 @@ compare: function () {
     });
 
     if (correct) {
-      // Jika statusnya BARU SAJA berubah menjadi benar
       if ($.inArray(level.name, this.solved) === -1) {
         this.solved.push(level.name);
-        this.liveSyncData(); // <-- Langsung rekam ke Spreadsheet
       }
       $("[data-level=" + this.level + "]").addClass("solved");
       $("#next").removeClass("disabled").addClass("animated animation");
     } else {
-      // Jika statusnya dirubah kembali menjadi salah
       const index = $.inArray(level.name, this.solved);
       if (index !== -1) {
         this.solved.splice(index, 1);
         $("[data-level=" + this.level + "]").removeClass("solved");
-        this.liveSyncData(); // <-- Langsung update status salah ke Spreadsheet
       }
-      this.changed = true;
       $("#next").removeClass("animated animation").addClass("disabled");
     }
   },
   
   /**
-   * Sinkronisasi data real-time ke Spreadsheet (Dinonaktifkan agar data dikirim hanya sekali di akhir)
+   * Sinkronisasi data real-time ke Spreadsheet
    */
   liveSyncData: function () {
     const playerName = localStorage.getItem("playerName");
     const playerAbsence = localStorage.getItem("playerAbsence");
     if (!playerName || !playerAbsence) return;
 
-    // GANTI DENGAN URL APPS SCRIPT BARUMU
-    const googleScriptUrl = "https://script.google.com/macros/s/AKfycbytl1ewpr9tXB88d3rO1S6FhpRnj8JKLR0B71655UTPczvcACNpA8_wJvnwSiuTU5cG9Q/exec"; 
+    // Jika waktu pengerjaan sudah melebihi 30 menit, jangan simpan dan picu timeout
+    if (this.gameStartTime && Date.now() - this.gameStartTime >= 1800 * 1000) {
+      this.handleTimeout();
+      return;
+    }
+    if (this.timeLeft <= 0) {
+      this.handleTimeout();
+      return;
+    }
     
     const score = Math.round((this.solved.length / levels.length) * 100);
     
@@ -1579,7 +1612,6 @@ compare: function () {
     
     const detailJawaban = levels.map(level => {
         const levelId = level.name;
-        // Mengambil jumlah klik Cast Spell dari levelRunCounts
         const tries = this.levelRunCounts ? (this.levelRunCounts[levelId] || 0) : 0;
         const isSolved = this.solved.includes(levelId);
         return {
@@ -1592,10 +1624,10 @@ compare: function () {
     formData.append("nama", playerName);
     formData.append("absen", playerAbsence);
     formData.append("skor", score);
-    formData.append("waktuPengerjaan", waktuPengerjaan); // Waktu pengerjaan dikirim ke Apps Script
+    formData.append("waktuPengerjaan", waktuPengerjaan);
     formData.append("detailJawaban", JSON.stringify(detailJawaban));
 
-    fetch(googleScriptUrl, {
+    fetch(this.googleScriptUrl, {
       method: "POST",
       mode: "no-cors",
       body: formData,
@@ -1848,7 +1880,8 @@ compare: function () {
             let pValue = event.target.textContent.split(" ")[0];
             pValue = game.getDefaultPropVal(pValue);
             game.writeCSS(pName, pValue);
-            game.check();
+            game.changed = true;
+            $("#next").removeClass("animated animation disabled");
           });
 
           clickedCode = code;
