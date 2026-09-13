@@ -85,7 +85,8 @@ var game = {
         var mobileTimer = document.getElementById("timer-mobile");
         if (mobileTimer) mobileTimer.textContent = display;
       } else {
-        game.handleTimeout();
+        // Waktu normal 30 menit habis: simpan hasil data dan akhiri game
+        game.endGame();
       }
     }, 1000);
   },
@@ -181,13 +182,13 @@ var game = {
       return;
     }
 
-    // Cek jika waktu pengerjaan sudah melebihi 30 menit (1800 detik)
-    if (this.gameStartTime && Date.now() - this.gameStartTime >= 1800 * 1000) {
+    // Cek jika ada bug sistem di mana waktu tercatat > 30 menit (misal > 31 menit)
+    if (this.gameStartTime && Date.now() - this.gameStartTime > 1860 * 1000) {
       this.handleTimeout();
       return;
     }
     if (this.timeLeft <= 0) {
-      this.handleTimeout();
+      this.endGame();
       return;
     }
 
@@ -227,6 +228,7 @@ var game = {
    * Move to next level
    */
   next: function () {
+    this.isAdvancing = false;
     this.level++;
     this.changed = false;
     this.loadLevel(levels[this.level]);
@@ -238,7 +240,9 @@ var game = {
    * Move to previous level
    */
   prev: function () {
+    this.isAdvancing = false;
     this.level--;
+    this.changed = false;
     this.loadLevel(levels[this.level]);
     this.generateProgressDots();
     this.updateNextLevelBtn();
@@ -634,11 +638,11 @@ var game = {
       performanceIcon = "💪";
     }
 
-    // Hitung waktu pengerjaan
-    let waktuPengerjaan = "N/A";
+    // Hitung waktu pengerjaan (maksimal 30 menit jika selesai tepat waktu)
+    let waktuPengerjaan = "30 menit 00 detik";
     if (this.gameStartTime) {
       const elapsedMs = Date.now() - this.gameStartTime;
-      const totalSeconds = Math.floor(elapsedMs / 1000);
+      const totalSeconds = Math.min(Math.floor(elapsedMs / 1000), 1800);
       const mins = Math.floor(totalSeconds / 60);
       const secs = totalSeconds % 60;
       waktuPengerjaan = `${mins} menit ${secs < 10 ? "0" : ""}${secs} detik`;
@@ -1060,7 +1064,9 @@ Gunakan bahasa Indonesia yang kasual, ramah, dan ringkas (maksimal 3 paragraf). 
     // Set level content
     $("#before").text(level.before);
     $("#after").text(level.after);
-    $("#next").removeClass("animated animation").addClass("disabled");
+    this.isAdvancing = false;
+    $("#next").removeClass("animated animation disabled");
+    $("#nextLevelBtn").removeClass("disabled");
 
     // Fade-in instructions
     var $instructions = $("#instructions");
@@ -1477,15 +1483,15 @@ Gunakan bahasa Indonesia yang kasual, ramah, dan ringkas (maksimal 3 paragraf). 
    * Check if current solution is correct and apply visual styles
    */
   check: async function () {
-    if (!document.startViewTransition) {
-      this.applyStyles();
-      this.compare();
-      return;
-    }
-
-    const transition = document.startViewTransition(() => this.applyStyles());
     try {
-      await transition.finished;
+      if (document.startViewTransition) {
+        const transition = document.startViewTransition(() => this.applyStyles());
+        await transition.finished;
+      } else {
+        this.applyStyles();
+      }
+    } catch (e) {
+      this.applyStyles();
     } finally {
       this.compare();
     }
