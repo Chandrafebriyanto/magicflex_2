@@ -32,7 +32,7 @@ var game = {
 
   // Game state
   googleScriptUrl:
-    "https://script.google.com/macros/s/AKfycbyfdnQgBWcSy6PaEfka9HyTwZ0OK8va_p-gBwlDSLAc5LKV4UA0Adhyrml6AsXksHZtBw/exec",
+    "https://script.google.com/macros/s/AKfycbzNaAFCCBjUZRHO6UerMyZ1JKaU_jOXV2rEC_PtVT811C9pFa2hUgndKP8dtGKUCG_Zng/exec",
   language: window.location.hash.substring(1) || "id",
   level: parseInt(localStorage.level, 10) || 0,
   answers: (localStorage.answers && JSON.parse(localStorage.answers)) || {},
@@ -112,7 +112,7 @@ var game = {
   },
 
   /**
-   * Menangani kondisi ketika waktu pengerjaan lebih dari 30 menit (timeout)
+   * Menangani kondisi ketika website ditinggalkan/ditutup dan waktu pengerjaan melebihi 30 menit
    * Menghapus data pengerjaan dari Spreadsheet secara otomatis.
    */
   handleTimeout: function () {
@@ -122,9 +122,9 @@ var game = {
     if (typeof Swal !== "undefined") {
       Swal.fire({
         icon: "error",
-        title: "⏰ Waktu Habis!",
-        html: '<p style="font-size:1em;">Waktu pengerjaan telah melebihi <strong>30 menit</strong>.</p><p style="font-size:0.9em;color:#ef4444;margin-top:8px;">Sesuai ketentuan, data pengerjaan kamu di spreadsheet telah <strong>dihapus secara otomatis</strong>.</p>',
-        confirmButtonText: "🔄 Ulangi dari Awal",
+        title: "⏰ Sesi Dibatalkan!",
+        html: '<p style="font-size:1em;">Waktu pengerjaan telah melebihi batas <strong>30 menit</strong> karena halaman ditutup atau ditinggalkan.</p><p style="font-size:0.9em;color:#ef4444;margin-top:8px;">Data pengerjaan kamu di spreadsheet telah <strong>dihapus secara otomatis</strong>.</p>',
+        confirmButtonText: "🔄 Mulai Ulang",
         allowOutsideClick: false,
         customClass: { confirmButton: "swal2-biru-btn", popup: "swal2-enhanced-popup" },
       }).then(() => {
@@ -134,7 +134,7 @@ var game = {
         location.reload();
       });
     } else {
-      alert("Waktu Habis! Waktu pengerjaan telah melebihi 30 menit. Data kamu di spreadsheet telah dihapus.");
+      alert("Sesi Dibatalkan! Waktu pengerjaan melebihi 30 menit karena halaman ditutup. Data kamu di spreadsheet telah dihapus.");
       this.resetGame();
       localStorage.removeItem("playerName");
       localStorage.removeItem("playerAbsence");
@@ -182,8 +182,9 @@ var game = {
       return;
     }
 
-    // Cek jika ada bug sistem di mana waktu tercatat > 30 menit (misal > 31 menit)
-    if (this.gameStartTime && Date.now() - this.gameStartTime > 1860 * 1000) {
+    // Jika siswa menutup website saat bermain dan kembali setelah lebih dari 30 menit:
+    // Hapus data pengerjaan dari spreadsheet
+    if (this.gameStartTime && Date.now() - this.gameStartTime > 1800 * 1000) {
       this.handleTimeout();
       return;
     }
@@ -999,7 +1000,10 @@ Gunakan bahasa Indonesia yang kasual, ramah, dan ringkas (maksimal 3 paragraf). 
         const levelId = levels[game.level].name;
 
         game.levelRunCounts = game.levelRunCounts || {};
-        game.levelRunCounts[levelId] = (game.levelRunCounts[levelId] || 0) + 1;
+        if (!game.levelRunCounts[levelId] || game.changed) {
+          game.levelRunCounts[levelId] = (game.levelRunCounts[levelId] || 0) + 1;
+          localStorage.setItem("levelRunCounts", JSON.stringify(game.levelRunCounts));
+        }
 
         await game.check();
         const isSolved = $.inArray(levelId, game.solved) !== -1;
@@ -1211,16 +1215,22 @@ Gunakan bahasa Indonesia yang kasual, ramah, dan ringkas (maksimal 3 paragraf). 
     //     $(this).removeClass();
     //   },
     // );
-    // Tombol Cast Spell (Hanya untuk testing/menjalankan kode visual di layar)
+    // Tombol Cast Spell (Dihitung sebagai uji coba, menguji visual CSS, dan mencatat data pengujian ke spreadsheet)
     $("#next").off("click").on("click", async function () {
       $("#code").focus();
 
-      // Jalankan & terapkan kode CSS secara visual untuk testing
+      // 1. Tambah hitungan percobaan (tries) setiap kali tombol Cast Spell diklik
+      const levelId = levels[game.level].name;
+      game.levelRunCounts = game.levelRunCounts || {};
+      game.levelRunCounts[levelId] = (game.levelRunCounts[levelId] || 0) + 1;
+      localStorage.setItem("levelRunCounts", JSON.stringify(game.levelRunCounts));
+
+      // 2. Jalankan & terapkan kode CSS secara visual untuk pengujian
       await game.check();
       game.changed = false;
 
-      // Simpan status ke localStorage untuk persistence
-      localStorage.setItem("levelRunCounts", JSON.stringify(game.levelRunCounts || {}));
+      // 3. Rekam data pengujian (tries, status saat ini, waktu) ke Spreadsheet
+      game.liveSyncData();
     });
 
     // Next Level / Finish button (Validasi apakah jawaban benar sebelum lanjut)
@@ -1229,9 +1239,12 @@ Gunakan bahasa Indonesia yang kasual, ramah, dan ringkas (maksimal 3 paragraf). 
 
       const levelId = levels[game.level].name;
 
-      // Tambah hitungan percobaan saat validasi akhir (tombol Lanjut)
+      // Jika user langsung klik tombol lanjut tanpa cast spell atau ada perubahan kode, catat percobaan
       game.levelRunCounts = game.levelRunCounts || {};
-      game.levelRunCounts[levelId] = (game.levelRunCounts[levelId] || 0) + 1;
+      if (!game.levelRunCounts[levelId] || game.changed) {
+        game.levelRunCounts[levelId] = (game.levelRunCounts[levelId] || 0) + 1;
+        localStorage.setItem("levelRunCounts", JSON.stringify(game.levelRunCounts));
+      }
 
       // Evaluasi kode terkini
       await game.check();
@@ -1593,24 +1606,14 @@ Gunakan bahasa Indonesia yang kasual, ramah, dan ringkas (maksimal 3 paragraf). 
     const playerName = localStorage.getItem("playerName");
     const playerAbsence = localStorage.getItem("playerAbsence");
     if (!playerName || !playerAbsence) return;
-
-    // Jika waktu pengerjaan sudah melebihi 30 menit, jangan simpan dan picu timeout
-    if (this.gameStartTime && Date.now() - this.gameStartTime >= 1800 * 1000) {
-      this.handleTimeout();
-      return;
-    }
-    if (this.timeLeft <= 0) {
-      this.handleTimeout();
-      return;
-    }
     
     const score = Math.round((this.solved.length / levels.length) * 100);
     
-    // Hitung waktu pengerjaan secara live
+    // Hitung waktu pengerjaan secara live (di-cap maksimal 30 menit)
     let waktuPengerjaan = "N/A";
     if (this.gameStartTime) {
       const elapsedMs = Date.now() - this.gameStartTime;
-      const totalSeconds = Math.floor(elapsedMs / 1000);
+      const totalSeconds = Math.min(Math.floor(elapsedMs / 1000), 1800);
       const mins = Math.floor(totalSeconds / 60);
       const secs = totalSeconds % 60;
       waktuPengerjaan = `${mins} menit ${secs < 10 ? "0" : ""}${secs} detik`;
