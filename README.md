@@ -524,24 +524,20 @@ game.level  // Current level (0-24)
 <table>
   <tr>
     <td align="center">
-      <img src="images/cahya.jpg" width="100px" alt="Cahya"/><br/>
-      <b>Cahya</b><br/>
-      <i>Lead Developer</i>
+      <img src="images/cahya.jpg" width="100px" alt="Ima Umiatul Chusnah"/><br/>
+      <b>Ima Umiatul Chusnah</b><br/>
     </td>
     <td align="center">
-      <img src="images/kholis.jpg" width="100px" alt="Kholis"/><br/>
-      <b>Kholis</b><br/>
-      <i>UI/UX Designer</i>
+      <img src="images/cahya.jpg" width="100px" alt="Hanydhar Rose Manicha"/><br/>
+      <b>Hanydhar Rose Manicha</b><br/>
     </td>
     <td align="center">
-      <img src="images/izul.jpg" width="100px" alt="Izul"/><br/>
-      <b>Izul</b><br/>
-      <i>Backend Developer</i>
+      <img src="images/cahya.jpg" width="100px" alt="Maridho Anike Putri"/><br/>
+      <b>Maridho Anike Putri</b><br/>
     </td>
     <td align="center">
-      <img src="images/yudha.jpg" width="100px" alt="Yudha"/><br/>
-      <b>Yudha</b><br/>
-      <i>Content Creator</i>
+      <img src="images/izul.jpg" width="100px" alt="Candra Febriyanto"/><br/>
+      <b>Candra Febriyanto</b><br/>
     </td>
   </tr>
 </table>
